@@ -34,6 +34,10 @@ def global_context(request):
         'cart_total': cart_total,
         # Feature flag: public login/registration temporarily disabled
         'auth_enabled': getattr(settings, 'AUTH_ENABLED', True),
+        # Feature flag: online payments only when Razorpay keys are configured
+        'razorpay_enabled': bool(
+            getattr(settings, 'RAZORPAY_KEY_ID', '') and getattr(settings, 'RAZORPAY_KEY_SECRET', '')
+        ),
         # Company / contact info (replaces hardcoded values in templates)
         'site_company_name': getattr(settings, 'COMPANY_NAME', 'Customise Clothing'),
         'site_contact_phone': getattr(settings, 'CONTACT_PHONE', '+91 9114960778'),

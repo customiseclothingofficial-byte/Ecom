@@ -243,12 +243,10 @@
                       <span class="badge bg-primary ms-2">Default</span>
                       {% endif %}
                     </div>
-                    <input type="radio" name="selected_address" value="{{ address.id }}" class="form-check-input" {% if
-                      address.is_default %}checked{% endif %}>
+                    <input type="radio" name="selected_address" value="{{ address.id }}" class="form-check-input" {% if address.is_default %}checked{% endif %}>
                   </div>
                   <small class="text-muted d-block mt-1">
-                    {{ address.address_line1 }}{% if address.address_line2 %}, {{ address.address_line2 }}{% endif
-                    %}<br>
+                    {{ address.address_line1 }}{% if address.address_line2 %}, {{ address.address_line2 }}{% endif %}<br>
                     {{ address.city }}, {{ address.state }} - {{ address.postal_code }}<br>
                     Phone: {{ address.phone }}
                   </small>
@@ -267,8 +265,7 @@
           <!-- Address Form -->
           <div id="addressForm"
             class="{% if user.is_authenticated and default_address and not form %}d-none{% endif %}">
-            <h6 class="mb-3"><i class="fas fa-map-marker-alt me-2"></i>{% if user.is_authenticated and saved_addresses
-              %}New Address{% else %}Shipping Address{% endif %}</h6>
+            <h6 class="mb-3"><i class="fas fa-map-marker-alt me-2"></i>{% if user.is_authenticated and saved_addresses %}New Address{% else %}Shipping Address{% endif %}</h6>
             <form id="checkoutForm" method="post" action="{% url 'store:checkout' %}">
               {% csrf_token %}
               <div class="mb-3">
@@ -347,11 +344,20 @@
           </div>
           {% endif %}
           <div class="mb-4">
+            {% if razorpay_enabled %}
             <div class="form-check mb-2">
               <input class="form-check-input" type="radio" name="payment_method" id="onlineOption" value="online"
                 checked>
               <label class="form-check-label" for="onlineOption">
                 <i class="fas fa-credit-card me-2"></i>Pay Online (UPI, Cards, Netbanking)
+              </label>
+            </div>
+            {% endif %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="payment_method" id="codOption" value="cod"
+                {% if not razorpay_enabled %}checked{% endif %}>
+              <label class="form-check-label" for="codOption">
+                <i class="fas fa-money-bill-wave me-2"></i>Cash on Delivery (₹10 handling charge)
               </label>
             </div>
           </div>
@@ -480,6 +486,8 @@
   </div>
 </div>
 
+{% endblock %}
+
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -496,8 +504,8 @@
 
     const baseTotal = {{ cart_total.total_price }};
   const deliveryCharge = {{ delivery_info.delivery_charge }};
-  // const codCharge = 10; // COD Removed
-  const maxWalletBalance = {{ user_wallet.balance|default: 0 }};
+  const codCharge = 10;
+  const maxWalletBalance = {{ user_wallet.balance|default:0 }};
 
   let currentWalletAmount = 0;
 
@@ -505,8 +513,8 @@
   function updatePaymentMethod() {
     let totalAmount = baseTotal + deliveryCharge;
 
-    // COD Logic removed
-    // if (codOption && codOption.checked) { ... }
+    const codOption = document.getElementById('codOption');
+    if (codOption && codOption.checked) totalAmount += codCharge;
 
     // Apply wallet discount
     let remainingTotal = totalAmount - currentWalletAmount;
@@ -530,6 +538,8 @@
 
   // Event listeners for payment methods
   if (onlineOption) onlineOption.addEventListener('change', updatePaymentMethod);
+  const codOptionEl = document.getElementById('codOption');
+  if (codOptionEl) codOptionEl.addEventListener('change', updatePaymentMethod);
 
   // Wallet functionality
   if (useWallet) {
@@ -694,8 +704,8 @@
             // Open Razorpay Modal Instantly
             openRazorpayModal(data);
           } else {
-            // Zero payment (wallet full)
-            window.location.href = data.redirect_url;
+            // COD / full-wallet order: go to success page
+            window.location.href = '/order-detail/' + data.order_id + '/';
           }
         } else {
           alert('Error: ' + (data.error || 'Failed to place order'));
@@ -766,5 +776,7 @@
 });
 </script>
 
+{% if razorpay_enabled %}
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% endif %}
 {% endblock %}

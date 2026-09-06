@@ -137,13 +137,7 @@ static/
 *.sqlite3
 *.db
 
-# Django migrations
-*/migrations/
-**/migrations/
-migrations/
-# Keep the __init__.py files in migrations
-!*/migrations/__init__.py
-!**/migrations/__init__.py
+# NOTE: Django migrations MUST be tracked in git for production deploys.
 
 # Environment variables
 .env
@@ -259,16 +253,4 @@ user_uploads/
 *.tmp
 *.temp
 
-# Project specific - Add any project-specific files to ignore
-# For example:
-# config/secrets.py
-# deployment/
-# docker-compose.override.yml
-ecommerce_project/settings.py
-ecommerce_project/settings.py
-
-*settings.py*
-Ecommerce/store/migrations
-ecommerce_project/settings.py
-ecommerce_project/settings.py
-store/migrations/__pycache__/__init__.cpython-312.pyc
+# Project specific - secrets live in .env; settings.py itself must be tracked
