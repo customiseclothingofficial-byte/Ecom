@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  .category-page-wrapper {
+    padding: 1.25rem 0 2.5rem;
+    min-height: 80vh;
+    background-color: #F9FAFB;
+  }
+
+  .cat-header-box {
+    margin-bottom: 1.25rem;
+    text-align: left;
+  }
+
+  .cat-page-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.25rem;
+    color: #111827;
+    text-transform: uppercase;
+  }
+
+  .cat-page-breadcrumb {
+    font-size: 0.825rem;
+    color: #6B7280;
+    font-weight: 500;
+  }
+
+  /* Enhanced Product Cards */
+  .cat-product-card {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  }
+
+  .cat-product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+    border-color: #10B981;
+  }
+
+  .cat-card-img-wrap {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: #F3F4F6;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .cat-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .cat-product-card:hover .cat-card-img-wrap img {
+    transform: scale(1.04);
+  }
+
+  .cat-card-body {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 4px;
+  }
+
+  .cat-card-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .cat-card-price {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #10B981;
+  }
+
+  .btn-view-product {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #111827;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+  }
+
+  .cat-product-card:hover .btn-view-product {
+    background: #10B981;
+  }
+
+  .sub-cat-pill-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 1.25rem;
+    scrollbar-width: none;
+  }
+
+  .sub-cat-pill-bar::-webkit-scrollbar { display: none; }
+
+  .sub-cat-chip {
+    padding: 6px 14px;
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #374151;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .sub-cat-chip:hover {
+    background: #000000;
+    color: #FFFFFF;
+    border-color: #000000;
+  }
+
+  @media (max-width: 576px) {
+    .category-page-wrapper {
+      padding: 0.85rem 0 2rem;
+    }
+
+    .cat-page-title {
+      font-size: 1.4rem;
+    }
+
+    .cat-card-body {
+      padding: 8px;
+    }
+
+    .cat-card-title {
+      font-size: 0.825rem;
+    }
+
+    .cat-card-price {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<div class="category-page-wrapper">
+  <div class="container" style="max-width: 1140px;">
+    
+    <!-- Category Title & Breadcrumb -->
+    <div class="cat-header-box">
+      <h1 class="cat-page-title">{{ category.name }}</h1>
+      <div class="cat-page-breadcrumb">
+        <a href="{% url 'store:home' %}" class="text-muted text-decoration-none">Home</a> / {{ category.name }}
+      </div>
+    </div>
+
+    <!-- Sub-categories (if any) -->
+    {% if sub_categories %}
+    <div class="sub-cat-pill-bar">
+      {% for sub in sub_categories %}
+        {% if sub.id %}
+        <a href="{% url 'store:category_page' sub.id %}" class="sub-cat-chip">
+          {{ sub.name }}
+        </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Products Grid -->
+    <div class="row g-2 g-md-3">
+      {% for item in products_with_sizes %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="cat-product-card">
+          <a href="{% url 'store:product_detail' item.product.id %}" class="text-decoration-none">
+            <div class="cat-card-img-wrap">
+              {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+              {% elif item.product.images.all %}
+                <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
+              {% else %}
+                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-muted">
+                  <i class="fas fa-image fa-2x"></i>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="cat-card-body">
+              <h5 class="cat-card-title">{{ item.product.name }}</h5>
+
+              {% if item.product.colors.exists %}
+              <div class="d-flex gap-1 my-1">
+                {% for color in item.product.colors.all|slice:":5" %}
+                <span style="width: 10px; height: 10px; background: {{ color.hex_code }}; border-radius: 50%; border: 1px solid rgba(0,0,0,0.15);" title="{{ color.name }}"></span>
+                {% endfor %}
+              </div>
+              {% endif %}
+
+              <div class="mt-auto pt-1 d-flex align-items-center justify-content-between">
+                <span class="cat-card-price">₹{{ item.product.price }}</span>
+                <span class="btn-view-product"><i class="fas fa-arrow-right"></i></span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-5 bg-white rounded-3 border">
+        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+        <h4 class="fw-bold mb-2">No Products Found</h4>
+        <p class="text-muted small mb-4">This category currently has no products listed.</p>
+        <a href="{% url 'store:home' %}" class="btn btn-dark rounded-pill px-4 py-2 fw-bold text-uppercase" style="font-size: 0.8rem;">Back to Home</a>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

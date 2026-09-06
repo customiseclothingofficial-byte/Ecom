@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Create Account - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  .register-wrapper {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 3rem 1rem;
+  }
+
+  .register-card {
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    padding: 3rem 2.5rem;
+    background: #fff;
+    width: 100%;
+    max-width: 550px;
+    margin: 0 auto;
+  }
+
+  .register-card h2 {
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+  }
+
+  .register-card p {
+    text-align: center;
+    color: #6B7280;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 35px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-label {
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #4b5563;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+    display: block;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #F9FAFB;
+    font-size: 14px;
+    margin-bottom: 5px;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus {
+    border-color: #000;
+    background-color: #fff;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .form-text {
+    font-size: 11px;
+    margin-bottom: 15px;
+    color: #9CA3AF;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: #12B76A;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  .submit-btn:hover {
+    background: #0e9d5a;
+    transform: translateY(-2px);
+  }
+
+  .register-footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6B7280;
+  }
+
+  .register-footer a {
+    color: #000;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .register-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .error-msg {
+    color: #ef4444;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 4px;
+    margin-bottom: 10px;
+  }
+</style>
+
+<div class="register-wrapper">
+  <div class="register-card">
+    <h2>Join Us</h2>
+    <p>Find Your Flip Side</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger" style="font-size: 13px; border-radius: 8px;">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label class="form-label" for="id_username">Username</label>
+        {{ form.username|add_class:"form-control" }}
+        {% if form.username.errors %}
+        <div class="error-msg">{{ form.username.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="id_email">Email Address</label>
+        {{ form.email|add_class:"form-control" }}
+        <div class="form-text">We'll use this for your order updates.</div>
+        {% if form.email.errors %}
+        <div class="error-msg">{{ form.email.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="id_phone">Mobile Number</label>
+        {{ form.phone|add_class:"form-control" }}
+        <div class="form-text">Provide either email or mobile number.</div>
+        {% if form.phone.errors %}
+        <div class="error-msg">{{ form.phone.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="submit-btn">
+        Create account
+      </button>
+    </form>
+
+    <div class="register-footer">
+      Already a member? <a href="{% url 'login' %}">Sign in here</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

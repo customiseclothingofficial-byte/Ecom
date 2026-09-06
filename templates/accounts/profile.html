@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --veirdo-green: #12B76A;
+    --veirdo-black: #000000;
+    --veirdo-grey: #F3F4F6;
+    --text-primary: #000000;
+    --text-secondary: #6B7280;
+  }
+
+  .profile-container {
+    background: #ffffff;
+    min-height: 100vh;
+    padding: 3rem 0;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .profile-card {
+    background: white;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .profile-header {
+    background: #000;
+    color: white;
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--veirdo-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 3rem;
+    color: #fff;
+  }
+
+  .profile-name {
+    font-size: 28px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    letter-spacing: -0.5px;
+  }
+
+  .profile-header p {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+  }
+
+  .profile-info {
+    padding: 3rem;
+  }
+
+  .profile-info h3 {
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #000;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid #eaeaea;
+  }
+
+  .info-item-modern:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #000;
+    letter-spacing: 0.5px;
+  }
+
+  .info-value {
+    font-weight: 600;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .action-btn {
+    flex: 1;
+    padding: 16px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-primary-custom {
+    background: #000;
+    color: white;
+    border: none;
+  }
+
+  .btn-primary-custom:hover {
+    background: var(--veirdo-green);
+    transform: translateY(-2px);
+    color: white;
+  }
+
+  .btn-outline-custom {
+    background: transparent;
+    color: #000;
+    border: 1px solid #000;
+  }
+
+  .btn-outline-custom:hover {
+    background: #000;
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .profile-info {
+      padding: 2rem 1.5rem;
+    }
+  }
+</style>
+
+<div class="profile-page-container">
+  <div class="container-modern">
+    <div class="profile-card-modern">
+
+      <div class="p-header-modern">
+        <div class="section-tag">Account Profile</div>
+        <div class="avatar-modern">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <h1 class="p-name-modern">{{ user.get_full_name|default:user.username }}</h1>
+        <p class="p-meta-modern">Member since {{ user.date_joined|date:"M Y" }} • Premium Member</p>
+      </div>
+
+      <div class="info-list-modern">
+        <div class="info-item-modern">
+          <span class="info-label">Full Identity</span>
+          <span class="info-val">{{ user.get_full_name|default:user.username }}</span>
+        </div>
+        <div class="info-item-modern">
+          <span class="info-label">Communication</span>
+          <span class="info-val">{{ user.email|default:"No verified email" }}</span>
+        </div>
+        <div class="info-item-modern">
+          <span class="info-label">Access Level</span>
+          <span class="info-val">
+            {% if user.is_staff %}Administrator{% else %}Verified Shopper{% endif %}
+          </span>
+        </div>
+        <div class="info-item-modern">
+          <span class="info-label">Verification</span>
+          <span class="info-val" style="color: var(--primary-green);">
+            <i class="fas fa-check-circle me-1"></i> Account Active
+          </span>
+        </div>
+      </div>
+
+      <div class="profile-actions-modern">
+        <a href="{% url 'accounts:my_orders' %}" class="p-action-btn">
+          <i class="fas fa-shopping-bag"></i>
+          <span>My Orders</span>
+        </a>
+        <a href="{% url 'store:wallet' %}" class="p-action-btn">
+          <i class="fas fa-wallet"></i>
+          <span>My Wallet</span>
+        </a>
+        {# Cart hidden temporarily — uncomment when ready #}
+      </div>
+
+      <div style="margin-top: 48px; text-align: center;">
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger rounded-pill px-5">Secure Logout</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

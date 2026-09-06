@@ -1,0 +1,33 @@
+{% extends 'emails/base_email.html' %}
+
+{% block email_content %}
+<div style="text-align: center; margin-bottom: 30px;">
+    <div style="font-size: 50px; margin-bottom: 20px;">⚡</div>
+    <h1 style="margin: 0; font-size: 24px; font-weight: 800; text-transform: uppercase;">Order Update</h1>
+    <p style="color: #666; margin-top: 10px;">Ref: CCZ-100{{ order.id }}</p>
+</div>
+
+<div class="success-box">
+    <strong style="color: #12b76a; display: block; margin-bottom: 5px;">GOOD NEWS!</strong>
+    {{ status_message }}
+</div>
+
+<div style="margin: 30px 0;">
+    <p>We're moving fast on your order. You can check the current status and track your package using the button below.</p>
+</div>
+
+<div style="text-align: center; margin: 40px 0;">
+    <a href="{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:my_orders' %}" class="button">View Order Status</a>
+</div>
+
+<div style="border-top: 1px solid #eee; padding-top: 30px; margin-top: 30px;">
+    <h4 style="text-transform: uppercase; font-size: 14px; letter-spacing: 1px; color: #000; margin-bottom: 15px;">Summary</h4>
+    {% for item in order.items.all %}
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+        <span style="color: #666;">{{ item.product_name }} (x{{ item.quantity }})</span>
+    </div>
+    {% endfor %}
+</div>
+
+<p style="margin-top: 40px; color: #999; font-size: 12px; text-align: center;">Thanks for shipping with Customise Clothing!</p>
+{% endblock %}

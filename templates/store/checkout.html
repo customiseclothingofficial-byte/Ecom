@@ -1,0 +1,770 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Checkout - Customise Clothing{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --veirdo-green: #12B76A;
+    --veirdo-black: #000000;
+    --veirdo-grey: #F3F4F6;
+    --veirdo-blue: #004CFF;
+    --text-primary: #000000;
+    --text-secondary: #6B7280;
+  }
+
+  .checkout-container, .checkout-page-container {
+    background: #F9FAFB;
+    min-height: 80vh;
+    padding: 1.25rem 0 2.5rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .checkout-title {
+    color: var(--veirdo-black);
+    font-weight: 800;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    text-align: left;
+    margin-bottom: 1rem;
+    letter-spacing: -0.5px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 6px;
+  }
+
+  .checkout-card {
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    background: #FFFFFF;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+  }
+
+  .checkout-card h5 {
+    color: var(--veirdo-black);
+    font-weight: 800;
+    font-size: 1rem;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-label {
+    color: #4b5563;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .form-control {
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    padding: 12px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: var(--veirdo-grey);
+  }
+
+  .form-control:focus {
+    border-color: #000;
+    box-shadow: none;
+    background: #fff;
+  }
+
+  .address-card {
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+  }
+
+  .address-card:hover {
+    border-color: #000;
+    transform: translateY(-2px);
+  }
+
+  .address-card.selected {
+    border: 2px solid #000;
+    background: #fafafa;
+  }
+
+  .btn-place-order {
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 18px;
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .btn-place-order:hover {
+    background: var(--veirdo-green);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .order-summary {
+    position: sticky;
+    top: 80px;
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    padding: 1.25rem;
+  }
+
+  .summary-item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-size: 13px;
+    font-weight: 600;
+    border-bottom: 1px dashed #ddd;
+  }
+
+  .order-total {
+    background: var(--veirdo-grey);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .total-row:last-child {
+    margin-bottom: 0;
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--veirdo-black);
+  }
+
+  .section-badge {
+    font-size: 10px;
+    background: #000;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+
+  @media (max-width: 768px) {
+    .checkout-title {
+      font-size: 28px;
+    }
+
+    .order-summary {
+      position: static;
+    }
+
+    .address-studio-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-page-container">
+  <div class="container-modern">
+
+    <div class="page-header-modern">
+      <h1 class="page-title-modern">Checkout</h1>
+      <p style="color: var(--text-muted); font-size: 18px;">Review your selection and define delivery details.</p>
+    </div>
+
+    {% if errors %}
+    <div class="alert alert-danger mb-4">
+      <h6 class="mb-2"><i class="fas fa-exclamation-triangle me-2"></i>Please fix the following issues:</h6>
+      <ul class="mb-0">
+        {% for e in errors %}
+        <li>{{ e }}</li>
+        {% endfor %}
+      </ul>
+      {% if out_of_stock %}
+      <hr>
+      <div>
+        <strong>Out of stock:</strong>
+        <ul class="mb-0">
+          {% for s in out_of_stock %}
+          <li>{{ s }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="checkout-card p-4">
+          <h5><i class="fas fa-shipping-fast me-2"></i>Shipping Information</h5>
+
+          <!-- Saved Addresses Section -->
+          {% if user.is_authenticated and saved_addresses %}
+          <div class="mb-4">
+            <h6 class="mb-3"><i class="fas fa-address-book me-2"></i>Saved Addresses</h6>
+            <div class="row">
+              {% for address in saved_addresses %}
+              <div class="col-md-6 mb-3">
+                <div class="address-card {{ address.is_default|yesno:'border-primary,border-secondary' }}"
+                  onclick="selectSavedAddress({{ address.id }})" data-address-id="{{ address.id }}"
+                  data-full-name="{{ address.full_name }}" data-address-line1="{{ address.address_line1 }}"
+                  data-address-line2="{{ address.address_line2|default:'' }}" data-city="{{ address.city }}"
+                  data-state="{{ address.state }}" data-postal-code="{{ address.postal_code }}"
+                  data-phone="{{ address.phone }}">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <strong>{{ address.full_name }}</strong>
+                      {% if address.is_default %}
+                      <span class="badge bg-primary ms-2">Default</span>
+                      {% endif %}
+                    </div>
+                    <input type="radio" name="selected_address" value="{{ address.id }}" class="form-check-input" {% if
+                      address.is_default %}checked{% endif %}>
+                  </div>
+                  <small class="text-muted d-block mt-1">
+                    {{ address.address_line1 }}{% if address.address_line2 %}, {{ address.address_line2 }}{% endif
+                    %}<br>
+                    {{ address.city }}, {{ address.state }} - {{ address.postal_code }}<br>
+                    Phone: {{ address.phone }}
+                  </small>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleNewAddressForm()">
+                <i class="fas fa-plus me-1"></i>Add New Address
+              </button>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Address Form -->
+          <div id="addressForm"
+            class="{% if user.is_authenticated and default_address and not form %}d-none{% endif %}">
+            <h6 class="mb-3"><i class="fas fa-map-marker-alt me-2"></i>{% if user.is_authenticated and saved_addresses
+              %}New Address{% else %}Shipping Address{% endif %}</h6>
+            <form id="checkoutForm" method="post" action="{% url 'store:checkout' %}">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="full_name" id="full_name" class="form-control" required
+                  value="{% if form.full_name %}{{ form.full_name }}{% elif default_address %}{{ default_address.full_name }}{% endif %}"
+                  placeholder="Enter your full name">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Address Line 1</label>
+                <input type="text" name="address_line1" id="address_line1" class="form-control" required
+                  value="{% if form.address_line1 %}{{ form.address_line1 }}{% elif default_address %}{{ default_address.address_line1 }}{% endif %}"
+                  placeholder="Street address, building, etc.">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Address Line 2 <span class="text-muted">(optional)</span></label>
+                <input type="text" name="address_line2" id="address_line2" class="form-control"
+                  value="{% if form.address_line2 %}{{ form.address_line2 }}{% elif default_address %}{{ default_address.address_line2|default:'' }}{% endif %}"
+                  placeholder="Apartment, suite, unit, etc.">
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">City</label>
+                  <input type="text" name="city" id="city" class="form-control" required
+                    value="{% if form.city %}{{ form.city }}{% elif default_address %}{{ default_address.city }}{% endif %}"
+                    placeholder="City">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">State</label>
+                  <input type="text" name="state" id="state" class="form-control" required
+                    value="{% if form.state %}{{ form.state }}{% elif default_address %}{{ default_address.state }}{% endif %}"
+                    placeholder="State">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Postal Code</label>
+                  <input type="text" name="postal_code" id="postal_code" class="form-control" required
+                    value="{% if form.postal_code %}{{ form.postal_code }}{% elif default_address %}{{ default_address.postal_code }}{% endif %}"
+                    placeholder="ZIP/Postal Code">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Phone Number</label>
+                  <input type="text" name="phone" id="phone" class="form-control" required
+                    value="{% if form.phone %}{{ form.phone }}{% elif default_address %}{{ default_address.phone }}{% endif %}"
+                    placeholder="Phone number">
+                </div>
+              </div>
+          </div>
+
+          <h6 class="mt-4 mb-3"><i class="fas fa-credit-card me-2"></i>Payment Method</h6>
+
+          <!-- Wallet Section -->
+          {% if user.is_authenticated and user_wallet %}
+          <div class="payment-method-section mb-3">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" id="useWallet" name="use_wallet">
+              <label class="form-check-label" for="useWallet">
+                <i class="fas fa-wallet me-2"></i>Use Wallet Balance
+                <span class="text-success ms-2">(Available: ₹{{ user_wallet.balance }})</span>
+              </label>
+            </div>
+            <div id="walletAmountSection" class="mt-2" style="display: none;">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <input type="number" name="wallet_amount" id="walletAmount" class="form-control" min="0"
+                    max="{{ user_wallet.balance }}" step="0.01" placeholder="Enter amount to use from wallet">
+                </div>
+                <div class="col-md-4">
+                  <button type="button" class="btn btn-outline-primary btn-sm" id="useMaxWallet">
+                    Use Max (₹{{ user_wallet.balance }})
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <div class="mb-4">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="payment_method" id="onlineOption" value="online"
+                checked>
+              <label class="form-check-label" for="onlineOption">
+                <i class="fas fa-credit-card me-2"></i>Pay Online (UPI, Cards, Netbanking)
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-place-order">
+            <i class="fas fa-lock me-2"></i>Proceed to Payment
+          </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="checkout-card p-4 order-summary">
+          <h5><i class="fas fa-receipt me-2"></i>Order Summary</h5>
+
+          {% if regular_cart_items %}
+          <div class="section-badge">Regular Items</div>
+          {% for item in regular_cart_items %}
+          <div class="order-item">
+            <div class="d-flex align-items-center gap-3">
+              <div
+                style="width: 50px; height: 50px; flex-shrink: 0; background: #f8f8f8; border-radius: 4px; overflow: hidden;">
+                {% if item.product.image %}<img src="{{ item.product.image.url }}"
+                  style="width:100%; height:100%; object-fit: cover;">{% endif %}
+              </div>
+              <span class="order-item-name">
+                {{ item.product.name }}{% if item.size %} ({{ item.size.code }}){% endif %} × {{ item.quantity }}
+              </span>
+            </div>
+            <span class="order-item-price">₹{{ item.total_price }}</span>
+          </div>
+          {% endfor %}
+          {% endif %}
+
+          {% if personalized_cart_items %}
+          <div class="section-badge mt-3" style="background: var(--veirdo-green);">Custom Designs</div>
+          {% for p in personalized_cart_items %}
+          <div class="order-item"
+            style="background: #f0fff4; margin-bottom: 5px; padding: 12px; border-radius: 8px; border-left: 4px solid var(--veirdo-green);">
+            <div class="d-flex align-items-center gap-3">
+              <div
+                style="width: 50px; height: 65px; flex-shrink: 0; background: #fff; border-radius: 4px; overflow: hidden; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <img
+                  src="{% if p.admin_final_image %}{{ p.admin_final_image.url }}{% else %}{{ p.product.image.url }}{% endif %}"
+                  style="width:100%; height:100%; object-fit: cover;">
+              </div>
+              <div>
+                <div class="order-item-name fw-bold" style="font-size: 13px;">{{ p.product.name }}</div>
+                <div class="text-muted" style="font-size: 11px;">
+                  {% if p.size %}Size: {{ p.size.code }} | {% endif %}Custom Print
+                </div>
+                <div class="text-success" style="font-size: 10px; font-weight: 800;"><i class="fas fa-magic me-1"></i>
+                  PERSONALIZED VIEW</div>
+              </div>
+            </div>
+            <div class="text-end">
+              <div class="order-item-price">₹{{ p.cart_total_price }}</div>
+              <div class="small text-muted">Qty: {{ p.cart_quantity }}</div>
+            </div>
+          </div>
+          {% endfor %}
+          {% endif %}
+
+          {% if personalization_items %}
+          <!-- Pending ones still show below -->
+          <div class="section-badge mt-3" style="background: #6B7280;">Other Designs</div>
+          {% for p in personalization_items %}
+          {% if p.status != 'order_accepted' %}
+          <div class="order-item" style="opacity: 0.6; padding: 10px;">
+            <span class="order-item-name">{{ p.product.name }} <em>(Review pending)</em></span>
+            <span class="order-item-price">₹{{ p.product.price }}</span>
+          </div>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+
+          <div class="order-total">
+            <div class="total-row">
+              <span>Total Items:</span>
+              <span>{{ cart_total.total_items }}</span>
+            </div>
+            <div class="total-row">
+              <span>Subtotal:</span>
+              <span>₹{{ cart_total.total_price }}</span>
+            </div>
+            <div class="total-row">
+              <span>Delivery:</span>
+              {% if delivery_info.is_free_delivery %}
+              <span class="text-success">Free</span>
+              {% else %}
+              <span class="text-warning">₹{{ delivery_info.delivery_charge }}</span>
+              {% endif %}
+            </div>
+            {% if not delivery_info.is_free_delivery %}
+            <div class="total-row">
+              <span class="text-muted small">
+                <i class="fas fa-info-circle me-1"></i>
+                Add ₹{{ delivery_info.free_delivery_threshold }} more for free delivery
+              </span>
+            </div>
+            {% endif %}
+
+            <div class="total-row" id="walletUsedRow" style="display: none;">
+              <span>Wallet Used:</span>
+              <span class="text-info">-₹<span id="walletUsedAmount">0.00</span></span>
+            </div>
+            <div class="total-row" id="remainingAmountRow" style="display: none;">
+              <span>Remaining Amount:</span>
+              <span id="remainingAmount">₹0.00</span>
+            </div>
+            <div class="total-row">
+              <span>Total:</span>
+              <span id="finalTotal">₹{{ cart_total.total_price|add:delivery_info.delivery_charge }}</span>
+            </div>
+          </div>
+
+          <div class="small-note">
+            <i class="fas fa-truck me-1"></i>
+            Estimated delivery in 3-5 business days
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const onlineOption = document.getElementById('onlineOption');
+    const finalTotal = document.getElementById('finalTotal');
+    const useWallet = document.getElementById('useWallet');
+    const walletAmountSection = document.getElementById('walletAmountSection');
+    const walletAmount = document.getElementById('walletAmount');
+    const useMaxWallet = document.getElementById('useMaxWallet');
+    const walletUsedRow = document.getElementById('walletUsedRow');
+    const walletUsedAmount = document.getElementById('walletUsedAmount');
+    const remainingAmountRow = document.getElementById('remainingAmountRow');
+    const remainingAmount = document.getElementById('remainingAmount');
+
+    const baseTotal = {{ cart_total.total_price }};
+  const deliveryCharge = {{ delivery_info.delivery_charge }};
+  // const codCharge = 10; // COD Removed
+  const maxWalletBalance = {{ user_wallet.balance|default: 0 }};
+
+  let currentWalletAmount = 0;
+
+  // Handle payment method changes
+  function updatePaymentMethod() {
+    let totalAmount = baseTotal + deliveryCharge;
+
+    // COD Logic removed
+    // if (codOption && codOption.checked) { ... }
+
+    // Apply wallet discount
+    let remainingTotal = totalAmount - currentWalletAmount;
+
+    // Update display
+    if (currentWalletAmount > 0) {
+      if (walletUsedRow) walletUsedRow.style.display = 'flex';
+      if (walletUsedAmount) walletUsedAmount.textContent = currentWalletAmount.toFixed(2);
+      if (remainingAmountRow) remainingAmountRow.style.display = 'flex';
+      if (remainingAmount) remainingAmount.textContent = '₹' + Math.max(0, remainingTotal).toFixed(2);
+    } else {
+      if (walletUsedRow) walletUsedRow.style.display = 'none';
+      if (remainingAmountRow) remainingAmountRow.style.display = 'none';
+    }
+
+    if (finalTotal) finalTotal.textContent = '₹' + totalAmount.toFixed(2);
+  }
+
+  // Initial setup
+  updatePaymentMethod();
+
+  // Event listeners for payment methods
+  if (onlineOption) onlineOption.addEventListener('change', updatePaymentMethod);
+
+  // Wallet functionality
+  if (useWallet) {
+    useWallet.addEventListener('change', function () {
+      if (this.checked) {
+        if (walletAmountSection) walletAmountSection.style.display = 'block';
+      } else {
+        if (walletAmountSection) walletAmountSection.style.display = 'none';
+        currentWalletAmount = 0;
+        if (walletAmount) walletAmount.value = '';
+        updatePaymentMethod();
+      }
+    });
+  }
+
+  if (walletAmount) {
+    walletAmount.addEventListener('input', function () {
+      let amount = parseFloat(this.value) || 0;
+
+      // Validate wallet amount
+      if (amount > maxWalletBalance) {
+        amount = maxWalletBalance;
+        this.value = amount;
+      }
+
+      let totalWithCharges = baseTotal; // + (codOption && codOption.checked ? codCharge : 0);
+      if (amount > totalWithCharges) {
+        amount = totalWithCharges;
+        this.value = amount;
+      }
+
+      currentWalletAmount = amount;
+      updatePaymentMethod();
+    });
+  }
+
+  if (useMaxWallet) {
+    useMaxWallet.addEventListener('click', function () {
+      if (walletAmount) {
+        let totalWithCharges = baseTotal; // + (codOption && codOption.checked ? codCharge : 0);
+        let maxAmount = Math.min(maxWalletBalance, totalWithCharges);
+        walletAmount.value = maxAmount;
+        currentWalletAmount = maxAmount;
+        updatePaymentMethod();
+      }
+    });
+  }
+
+
+
+  // Function to approve personalization and add to cart
+  function approvePersonalization(requestId) {
+    fetch('{% url "store:approve_personalization" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: JSON.stringify({
+        'request_id': requestId
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message
+          alert(data.message);
+          // Reload the page to update the order summary
+          window.location.reload();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while adding item to cart.');
+      });
+  }
+
+
+
+  // Address management functions
+  function selectSavedAddress(addressId) {
+    // Remove selected class from all address cards
+    document.querySelectorAll('.address-card').forEach(card => {
+      card.classList.remove('selected');
+      card.querySelector('input[type="radio"]').checked = false;
+    });
+
+    // Add selected class to clicked card
+    const selectedCard = document.querySelector(`[data-address-id="${addressId}"]`);
+    selectedCard.classList.add('selected');
+    selectedCard.querySelector('input[type="radio"]').checked = true;
+
+    // Populate form fields
+    document.getElementById('full_name').value = selectedCard.dataset.fullName;
+    document.getElementById('address_line1').value = selectedCard.dataset.addressLine1;
+    document.getElementById('address_line2').value = selectedCard.dataset.addressLine2;
+    document.getElementById('city').value = selectedCard.dataset.city;
+    document.getElementById('state').value = selectedCard.dataset.state;
+    document.getElementById('postal_code').value = selectedCard.dataset.postalCode;
+    document.getElementById('phone').value = selectedCard.dataset.phone;
+
+    // Hide address form if using saved address
+    document.getElementById('addressForm').classList.add('d-none');
+  }
+
+  function toggleNewAddressForm() {
+    const addressForm = document.getElementById('addressForm');
+    const isHidden = addressForm.classList.contains('d-none');
+
+    if (isHidden) {
+      // Show form and clear saved address selection
+      addressForm.classList.remove('d-none');
+      document.querySelectorAll('.address-card').forEach(card => {
+        card.classList.remove('selected');
+        card.querySelector('input[type="radio"]').checked = false;
+      });
+      // Clear form fields
+      document.getElementById('full_name').value = '';
+      document.getElementById('address_line1').value = '';
+      document.getElementById('address_line2').value = '';
+      document.getElementById('city').value = '';
+      document.getElementById('state').value = '';
+      document.getElementById('postal_code').value = '';
+      document.getElementById('phone').value = '';
+    } else {
+      // Hide form
+      addressForm.classList.add('d-none');
+    }
+  }
+
+  // AJAX Order Placement & Razorpay Modal
+  const checkoutForm = document.getElementById('checkoutForm');
+  const placeOrderBtn = document.querySelector('.btn-place-order');
+
+  if (checkoutForm) {
+    checkoutForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      // Basic UI Feedback
+      const originalHTML = placeOrderBtn.innerHTML;
+      placeOrderBtn.disabled = true;
+      placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+
+      const formData = new FormData(this);
+      formData.append('ajax', 'true');
+
+      try {
+        const response = await fetch(this.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          if (data.payment_required) {
+            // Open Razorpay Modal Instantly
+            openRazorpayModal(data);
+          } else {
+            // Zero payment (wallet full)
+            window.location.href = data.redirect_url;
+          }
+        } else {
+          alert('Error: ' + (data.error || 'Failed to place order'));
+          placeOrderBtn.disabled = false;
+          placeOrderBtn.innerHTML = originalHTML;
+        }
+      } catch (err) {
+        console.error(err);
+        alert('An unexpected error occurred. Please try again.');
+        placeOrderBtn.disabled = false;
+        placeOrderBtn.innerHTML = originalHTML;
+      }
+    });
+  }
+
+  function openRazorpayModal(data) {
+    const options = {
+      "key": data.razorpay_key_id,
+      "amount": data.amount_paise,
+      "currency": data.currency,
+      "name": "Customise Clothing",
+      "description": "Payment for Order #" + data.order_id,
+      "image": "https://veirdo.in/cdn/shop/files/veirdo_logo_300x.png",
+      "order_id": data.razorpay_order_id,
+      "handler": function (response) {
+        // Success! Submit to callback endpoint
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = data.callback_url;
+
+        const fields = {
+          'razorpay_payment_id': response.razorpay_payment_id,
+          'razorpay_order_id': response.razorpay_order_id,
+          'razorpay_signature': response.razorpay_signature,
+          'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        };
+
+        for (const [key, value] of Object.entries(fields)) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = value;
+          form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+      },
+      "prefill": data.prefill,
+      "theme": {
+        "color": "#000000"
+      },
+      "modal": {
+        "ondismiss": function () {
+          placeOrderBtn.disabled = false;
+          placeOrderBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Proceed to Payment';
+        }
+      }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', function (response) {
+      alert("Payment Failed: " + response.error.description);
+    });
+    rzp.open();
+  }
+
+});
+</script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% endblock %}

@@ -1,0 +1,280 @@
+{% extends 'shop_admin_base.html' %}
+
+{% block title %}Order #{{ order.id }} - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-detail-page { padding: 40px 0; min-height: 80vh; }
+    .detail-card {
+        background: white; border-radius: 16px; padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; margin-bottom: 24px;
+    }
+    .detail-card h3 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-bottom: 16px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .info-grid .info-item label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; }
+    .info-grid .info-item p { font-size: 14px; font-weight: 600; color: #1f2937; margin: 2px 0 8px; }
+    .status-pill {
+        padding: 4px 14px; border-radius: 50px; font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;
+    }
+    .status-pill.pending    { background: #e0e7ff; color: #3730a3; }
+    .status-pill.processing { background: #fef3c7; color: #92400e; }
+    .status-pill.shipped    { background: #dbeafe; color: #1e40af; }
+    .status-pill.delivered  { background: #d1fae5; color: #065f46; }
+    .status-pill.cancelled  { background: #fee2e2; color: #dc2626; }
+    .items-table { width: 100%; border-collapse: collapse; }
+    .items-table th {
+        background: #f8fafc; padding: 10px 12px; font-size: 11px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 1px; color: #6b7280; text-align: left; border-bottom: 2px solid #e5e7eb;
+    }
+    .items-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+    .timeline-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+    .timeline-item:last-child { border-bottom: none; }
+    .timeline-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary-color); margin-top: 6px; flex-shrink: 0; }
+    .timeline-content { font-size: 13px; }
+    .timeline-content .status-change { font-weight: 700; }
+    .timeline-content .timeline-meta { font-size: 11px; color: #9ca3af; }
+    .update-form select, .update-form input, .update-form textarea {
+        border-radius: 8px; border: 1px solid #e5e7eb; padding: 8px 12px; font-size: 13px; width: 100%;
+    }
+    .btn-update { background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .btn-update:hover { background: #4f46e5; }
+    .personalization-img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container order-detail-page">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="{% url 'store:admin_orders_list' %}" class="text-decoration-none" style="font-size: 13px;">
+                <i class="fas fa-arrow-left me-1"></i> Back to Orders
+            </a>
+            <h2 class="mt-2 mb-0" style="font-weight: 800;">Order #{{ order.id }}</h2>
+            <span class="text-muted" style="font-size: 13px;">{{ order.created_at|date:"M d, Y H:i" }}</span>
+        </div>
+        <span class="status-pill {{ order.status }}">{{ order.get_status_display }}</span>
+    </div>
+
+    <div class="row">
+        <!-- Left column -->
+        <div class="col-lg-8">
+            <!-- Order Items -->
+            <div class="detail-card">
+                <h3><i class="fas fa-box me-2"></i>Order Items</h3>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Size</th>
+                            <th>Color</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td>
+                                <strong>{{ item.product_name }}</strong>
+                                {% if item.personalization %}
+                                    <br><small class="text-muted">Personalized</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.size.code|default:"-" }}</td>
+                            <td>{{ item.color.name|default:"-" }}</td>
+                            <td>₹{{ item.unit_price }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td><strong>₹{{ item.line_total }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5" style="text-align: right; font-weight: 700;">Total:</td>
+                            <td><strong style="font-size: 16px;">₹{{ order.total_amount }}</strong></td>
+                        </tr>
+                        {% if order.wallet_amount_used > 0 %}
+                        <tr>
+                            <td colspan="5" style="text-align: right; color: #10b981;">Wallet Used:</td>
+                            <td style="color: #10b981;">-₹{{ order.wallet_amount_used }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="text-align: right; font-weight: 700;">Remaining (Online):</td>
+                            <td><strong>₹{{ order.remaining_amount }}</strong></td>
+                        </tr>
+                        {% endif %}
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Personalization Images -->
+            {% if personalization_images %}
+            <div class="detail-card">
+                <h3><i class="fas fa-image me-2"></i>Personalization Designs</h3>
+                {% for p in personalization_images %}
+                <div class="d-flex gap-3 align-items-start mb-3 pb-3 border-bottom">
+                    {% if p.user_image %}
+                    <div>
+                        <label style="font-size: 11px; color: #9ca3af; font-weight: 700;">USER UPLOAD</label><br>
+                        <img src="{{ p.user_image.url }}" class="personalization-img" alt="User upload">
+                    </div>
+                    {% endif %}
+                    {% if p.admin_image %}
+                    <div>
+                        <label style="font-size: 11px; color: #9ca3af; font-weight: 700;">FINAL DESIGN</label><br>
+                        <img src="{{ p.admin_image.url }}" class="personalization-img" alt="Final design">
+                    </div>
+                    {% endif %}
+                    <div>
+                        <strong>{{ p.product_name }}</strong>
+                        {% if p.admin_notes %}<br><small class="text-muted">{{ p.admin_notes }}</small>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Status History Timeline -->
+            <div class="detail-card">
+                <h3><i class="fas fa-clock-rotate-left me-2"></i>Status History</h3>
+                {% if status_history %}
+                    {% for entry in status_history %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="status-change">
+                                {% if entry.old_status %}{{ entry.old_status }}{% else %}Created{% endif %} → {{ entry.new_status }}
+                            </div>
+                            {% if entry.note %}<div>{{ entry.note }}</div>{% endif %}
+                            {% if entry.tracking_number %}<div>Tracking: <strong>{{ entry.tracking_number }}</strong> ({{ entry.carrier_name|default:"" }})</div>{% endif %}
+                            <div class="timeline-meta">
+                                {{ entry.created_at|date:"M d, Y H:i" }}
+                                {% if entry.changed_by %} by {{ entry.changed_by.username }}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted" style="font-size: 13px;">No status history yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="col-lg-4">
+            <!-- Customer Info -->
+            <div class="detail-card">
+                <h3><i class="fas fa-user me-2"></i>Customer</h3>
+                <div class="info-grid" style="grid-template-columns: 1fr;">
+                    <div class="info-item">
+                        <label>Name</label><p>{{ order.full_name }}</p>
+                        <label>Phone</label><p>{{ order.phone }}</p>
+                        {% if order.user %}<label>Username</label><p>{{ order.user.username }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="detail-card">
+                <h3><i class="fas fa-location-dot me-2"></i>Shipping Address</h3>
+                <p style="font-size: 14px; line-height: 1.7;">
+                    {{ order.address_line1 }}<br>
+                    {% if order.address_line2 %}{{ order.address_line2 }}<br>{% endif %}
+                    {{ order.city }}, {{ order.state }} - {{ order.postal_code }}
+                </p>
+            </div>
+
+            <!-- Payment Info -->
+            <div class="detail-card">
+                <h3><i class="fas fa-credit-card me-2"></i>Payment</h3>
+                <div class="info-grid" style="grid-template-columns: 1fr;">
+                    <div class="info-item">
+                        <label>Method</label><p>{{ order.get_payment_method_display }}</p>
+                        <label>Payment Status</label><p>{{ order.get_razorpay_payment_status_display }}</p>
+                        {% if order.razorpay_payment_id %}<label>Razorpay ID</label><p style="font-size: 12px;">{{ order.razorpay_payment_id }}</p>{% endif %}
+                        <label>Estimated Delivery</label><p>{{ order.estimated_delivery_date|date:"M d, Y"|default:"—" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tracking -->
+            <div class="detail-card">
+                <h3><i class="fas fa-truck me-2"></i>Tracking</h3>
+                <div class="info-grid" style="grid-template-columns: 1fr;">
+                    <div class="info-item">
+                        <label>Carrier</label><p>{{ order.carrier_name|default:"—" }}</p>
+                        <label>Tracking #</label><p>{{ order.tracking_number|default:"—" }}</p>
+                        {% if order.tracking_url %}<a href="{{ order.tracking_url }}" target="_blank" style="font-size: 13px;">Track Shipment <i class="fas fa-external-link-alt"></i></a>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Update Status Form -->
+            <div class="detail-card">
+                <h3><i class="fas fa-pen me-2"></i>Update Status</h3>
+                <form id="update-status-form" class="update-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280;">Status</label>
+                        <select name="status" class="form-select">
+                            {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if value == order.status %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280;">Note</label>
+                        <textarea name="note" rows="2" placeholder="Optional note..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280;">Tracking Number</label>
+                        <input type="text" name="tracking_number" value="{{ order.tracking_number|default:'' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280;">Carrier Name</label>
+                        <input type="text" name="carrier_name" value="{{ order.carrier_name|default:'' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280;">Tracking URL</label>
+                        <input type="url" name="tracking_url" value="{{ order.tracking_url|default:'' }}">
+                    </div>
+                    <button type="submit" class="btn-update w-100">
+                        <i class="fas fa-save me-1"></i> Update Order
+                    </button>
+                    <div id="update-result" class="mt-2" style="font-size: 13px;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('update-status-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const resultDiv = document.getElementById('update-result');
+    resultDiv.innerHTML = '<span class="text-muted">Updating...</span>';
+
+    fetch("{% url 'store:admin_update_order_status' order.id %}", {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            resultDiv.innerHTML = '<span class="text-success"><i class="fas fa-check me-1"></i>' + data.message + '</span>';
+            setTimeout(() => location.reload(), 1200);
+        } else {
+            resultDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times me-1"></i>' + data.error + '</span>';
+        }
+    })
+    .catch(err => {
+        resultDiv.innerHTML = '<span class="text-danger">Network error. Please try again.</span>';
+    });
+});
+</script>
+{% endblock %}

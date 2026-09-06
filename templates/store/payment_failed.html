@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Payment Failed - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  .failed-page-container {
+    padding: 80px 0;
+    min-height: 80vh;
+    text-align: center;
+  }
+  .failed-badge {
+    width: 80px; height: 80px;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 32px;
+  }
+  .failed-title { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+  .failed-message { font-size: 16px; color: #6b7280; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; }
+</style>
+
+<div class="container failed-page-container">
+  <div class="failed-badge">
+    <i class="fas fa-times"></i>
+  </div>
+  <h1 class="failed-title">Payment Failed</h1>
+  <p class="failed-message">
+    {{ error|default:"Something went wrong with your payment. Please try again or contact support if the amount was deducted." }}
+  </p>
+  {% if order %}
+    <p class="text-muted mb-3">Order #{{ order.id }} — Status: <strong>{{ order.get_status_display }}</strong></p>
+  {% endif %}
+  <div class="d-flex justify-content-center gap-3">
+    <a href="{% url 'store:home' %}" class="btn btn-outline-dark px-4 py-2 rounded-pill">
+      <i class="fas fa-home me-1"></i> Back to Home
+    </a>
+    {% if order %}
+      <a href="{% url 'store:order_detail' order.id %}" class="btn btn-dark px-4 py-2 rounded-pill">
+        <i class="fas fa-receipt me-1"></i> View Order
+      </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Orders - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --veirdo-green: #12B76A;
+    --veirdo-black: #000000;
+    --veirdo-grey: #F3F4F6;
+    --text-primary: #000000;
+    --text-secondary: #6B7280;
+  }
+
+  .orders-container {
+    background: #ffffff;
+    min-height: 100vh;
+    padding: 3rem 0;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .orders-header {
+    text-align: left;
+    margin-bottom: 3rem;
+    border-bottom: 2px solid #000;
+    padding-bottom: 15px;
+  }
+
+  .orders-title {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--veirdo-black);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    letter-spacing: -0.5px;
+  }
+
+  .order-card {
+    background: white;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+
+  .order-header {
+    background: var(--veirdo-grey);
+    padding: 1.5rem;
+    border-bottom: 1px solid #eaeaea;
+  }
+
+  .order-summary {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .order-detail {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .order-detail-label {
+    font-size: 10px;
+    color: #888;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .order-detail-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .order-status {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+
+  .status-processing {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-shipped {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-delivered {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-cancelled {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  .status-pending {
+    background: #e0e7ff;
+    color: #3730a3;
+  }
+
+  .order-body {
+    padding: 1.5rem;
+  }
+
+  .order-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .item-image {
+    width: 60px;
+    height: 80px;
+    border-radius: 4px;
+    background: var(--veirdo-grey);
+    margin-right: 1.5rem;
+    overflow: hidden;
+  }
+
+  .item-details {
+    flex: 1;
+  }
+
+  .item-name {
+    font-weight: 800;
+    font-size: 14px;
+    color: #000;
+    text-transform: uppercase;
+  }
+
+  .item-quantity {
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
+  }
+
+  .item-price {
+    font-weight: 800;
+    color: #000;
+    font-size: 16px;
+  }
+
+  .order-footer {
+    background: #fff;
+    padding: 1.5rem;
+    border-top: 1px solid #eaeaea;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .order-total {
+    font-size: 18px;
+    font-weight: 900;
+    color: #000;
+  }
+
+  .action-btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .btn-primary-action {
+    background: #000;
+    color: white;
+  }
+
+  .btn-primary-action:hover {
+    background: var(--veirdo-green);
+    color: white;
+  }
+
+  .btn-outline-action {
+    background: transparent;
+    color: #000;
+    border: 1px solid #000;
+  }
+
+  .btn-outline-action:hover {
+    background: #000;
+    color: white;
+  }
+
+  .empty-orders {
+    text-align: center;
+    padding: 6rem 2rem;
+  }
+
+  .empty-icon {
+    font-size: 60px;
+    color: #ddd;
+    margin-bottom: 1.5rem;
+  }
+
+  .shop-btn {
+    background: #000;
+    color: #fff;
+    padding: 14px 40px;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 13px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .shop-btn:hover {
+    background: var(--veirdo-green);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .order-summary {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .order-footer {
+      flex-direction: column;
+      gap: 15px;
+      align-items: flex-start;
+    }
+
+    .order-actions {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      gap: 10px;
+    }
+
+    .action-btn {
+      flex: 1;
+      text-align: center;
+    }
+  }
+</style>
+
+<div class="orders-page-container">
+  <div class="container-modern">
+
+    <div class="page-header-modern">
+      <div class="section-tag">History</div>
+      <h1 style="font-size: 48px; font-weight: 800; letter-spacing: -2px;">My Orders</h1>
+      <p style="color: var(--text-muted);">Manage and track all your premium acquisitions.</p>
+    </div>
+
+    <div class="o-list-modern">
+      {% if orders %}
+      {% for order in orders %}
+      <div class="o-card-modern">
+        <div class="o-top-modern">
+          <div class="o-meta">
+            <div class="m-item">
+              <label>Order Reference</label>
+              <span>#{{ order.id }}</span>
+            </div>
+            <div class="m-item">
+              <label>Date Placed</label>
+              <span>{{ order.created_at|date:"M d, Y" }}</span>
+            </div>
+            <div class="m-item">
+              <label>Total Value</label>
+              <span>₹{{ order.total_amount }}</span>
+            </div>
+          </div>
+          <div class="o-status-badge status-{{ order.status }}">
+            {{ order.get_status_display }}
+          </div>
+        </div>
+
+        <div class="o-items-preview">
+          {% for item in order.items.all %}
+          <div class="o-item-img" title="{{ item.product_name }}">
+            {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" alt="Item">
+            {% else %}
+            <i class="fas fa-image" style="color: #cbd5e0; font-size: 20px;"></i>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="o-actions-modern">
+          <a href="{% url 'store:order_detail' order.id %}" class="btn-o-modern btn-o-main">Order Details</a>
+          <a href="{% url 'store:track_order' order.id %}" class="btn-o-modern btn-o-outline">Live Tracking</a>
+
+          {% if order.can_be_returned %}
+          <a href="{% url 'store:request_return' order.id %}" class="btn-o-modern btn-o-outline"
+            style="color: #92400e !important; border-color: #fcd34d;">Return Items</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="text-center py-5">
+        <div class="section-tag">No Data</div>
+        <h3 class="mt-3">Your order history is empty.</h3>
+        <p class="text-muted mb-4">You haven't made any purchases yet.</p>
+        <a href="{% url 'store:all_products' %}" class="btn btn-dark rounded-pill px-5">Start Shopping</a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

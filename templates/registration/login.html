@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  .login-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 2rem 1rem;
+  }
+
+  .login-card {
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    background: #fff;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+  }
+
+  .login-card h2 {
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+  }
+
+  .form-label {
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #4b5563;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .form-control,
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #F9FAFB;
+    font-size: 14px;
+    margin-bottom: 15px;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus {
+    border-color: #000;
+    background-color: #fff;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: #12B76A;
+    /* Veirdo Green for primary action */
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  .submit-btn:hover {
+    background: #0e9d5a;
+    transform: translateY(-2px);
+  }
+
+  .login-footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6B7280;
+  }
+
+  .login-footer a {
+    color: #000;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .login-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .alert {
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px;
+    margin-bottom: 20px;
+  }
+</style>
+
+<div class="login-wrapper">
+  <div class="login-card">
+    <h2>Login</h2>
+
+    {% if request.GET.next %}
+    <div class="alert alert-info">
+      <i class="fas fa-lock me-2"></i>Please sign in to continue to checkout.
+    </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      <div class="mb-3">
+        <label for="id_login_field" class="form-label">Email / Username / Mobile</label>
+        {{ form.login_field }}
+        {% if form.login_field.errors %}
+        <div class="text-danger small mt-1">{{ form.login_field.errors|striptags }}</div>
+        {% endif %}
+        <p class="text-muted small mt-2">We'll send a 6-digit verification code to your email.</p>
+      </div>
+
+      <button type="submit" class="submit-btn">Continue</button>
+    </form>
+
+    <div class="login-footer">
+      New to Customise Clothing? <a href="{% url 'accounts:register' %}">Sign up for free</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

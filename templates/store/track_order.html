@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Track Order #{{ order.id }} - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  .tracking-page-container {
+    padding: 60px 0;
+    min-height: 80vh;
+  }
+
+  .tracking-card-modern {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .t-header-modern {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .section-tag {
+    background: var(--bg-green);
+    color: var(--primary-green);
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 15px;
+  }
+
+  /* Info Grid */
+  .t-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    background: white;
+    padding: 24px;
+    border-radius: 24px;
+    margin-bottom: 48px;
+    border: 1px solid var(--border);
+  }
+
+  .t-info-item label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .t-info-item span {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-main);
+  }
+
+  /* Timeline */
+  .timeline-modern {
+    padding-left: 40px;
+    position: relative;
+  }
+
+  .timeline-modern::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-step {
+    position: relative;
+    padding-bottom: 40px;
+  }
+
+  .timeline-step:last-child {
+    padding-bottom: 0;
+  }
+
+  .step-marker {
+    position: absolute;
+    left: -30px;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    z-index: 2;
+    transition: all 0.3s;
+  }
+
+  .timeline-step.completed .step-marker {
+    background: var(--primary-green);
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 5px var(--bg-green);
+  }
+
+  .timeline-step.active .step-marker {
+    background: var(--text-main);
+    border-color: var(--text-main);
+    box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.05);
+  }
+
+  .step-content {
+    opacity: 0.5;
+    transition: all 0.3s;
+  }
+
+  .timeline-step.completed .step-content,
+  .timeline-step.active .step-content {
+    opacity: 1;
+  }
+
+  .step-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .step-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .step-date {
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+    color: var(--primary-green);
+  }
+
+  @media (max-width: 576px) {
+    .t-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .tracking-card-modern {
+      padding: 24px;
+    }
+  }
+</style>
+
+<div class="tracking-page-container">
+  <div class="container-modern">
+    <div class="tracking-card-modern">
+
+      <div class="t-header-modern">
+        <div class="section-tag">Live Logistics</div>
+        <h1 style="font-size: 40px; font-weight: 800; letter-spacing: -2px;">Track Your Parcel</h1>
+        <p class="text-muted">Currently handling your order with premium care.</p>
+      </div>
+
+      <div class="t-info-grid">
+        <div class="t-info-item">
+          <label>Order ID</label>
+          <span>#{{ order.id }}</span>
+        </div>
+        <div class="t-info-item">
+          <label>Expected Arrival</label>
+          <span>{{ order.estimated_delivery_date|date:"M d, Y"|default:"TBD" }}</span>
+        </div>
+        <div class="t-info-item">
+          <label>Carrier Status</label>
+          <span style="color: var(--primary-green);">{{ order.get_status_display }}</span>
+        </div>
+      </div>
+
+      <div class="timeline-modern">
+
+        <!-- Step 1: Placed -->
+        <div class="timeline-step completed">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <div class="step-title">Order Placed</div>
+            <div class="step-desc">Your order has been received and is being validated.</div>
+            <div class="step-date">{{ order.created_at|date:"M d, Y - h:i A" }}</div>
+          </div>
+        </div>
+
+        <!-- Step 2: Processing -->
+        <div
+          class="timeline-step {% if order.status != 'pending' %}completed{% elif order.status == 'pending' %}active{% endif %}">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <div class="step-title">Processing</div>
+            <div class="step-desc">Our team is preparing your items and checking quality.</div>
+            {% if order.status != 'pending' %}
+            <div class="step-date">Processed</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Step 3: Shipped -->
+        <div
+          class="timeline-step {% if order.status == 'shipped' or order.status == 'delivered' %}completed{% elif order.status == 'processing' %}active{% endif %}">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <div class="step-title">In Transit</div>
+            <div class="step-desc">Your parcel is on its way to the delivery hub.</div>
+            {% if order.shipped_at %}
+            <div class="step-date">{{ order.shipped_at|date:"M d, Y" }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Step 4: Delivered -->
+        <div
+          class="timeline-step {% if order.status == 'delivered' %}completed{% elif order.status == 'shipped' %}active{% endif %}">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <div class="step-title">Delivered</div>
+            <div class="step-desc">Successfully handed over to the recipient.</div>
+            {% if order.delivered_at %}
+            <div class="step-date">{{ order.delivered_at|date:"M d, Y" }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top: 60px; text-align: center;">
+        <a href="{% url 'accounts:my_orders' %}" class="btn btn-dark rounded-pill px-5">Back to Dashboard</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1272 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Bag - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --cart-primary: #12B76A;
+    --cart-primary-dark: #099252;
+    --cart-dark: #111827;
+    --cart-gray-bg: #F9FAFB;
+    --cart-card-border: #E5E7EB;
+    --cart-text-muted: #6B7280;
+    --cart-radius-lg: 14px;
+    --cart-radius-md: 10px;
+    --cart-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  .cart-page-wrapper {
+    background-color: var(--cart-gray-bg);
+    min-height: 80vh;
+    padding: 1.25rem 0 2.5rem;
+  }
+
+  /* Header Section */
+  .cart-header-box {
+    margin-bottom: 1rem;
+  }
+
+  .cart-header-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--cart-dark);
+    margin-bottom: 0.15rem;
+    text-transform: uppercase;
+  }
+
+  .cart-header-subtitle {
+    color: var(--cart-text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  /* Nav Tabs */
+  .cart-nav-tabs {
+    display: inline-flex;
+    background: #EFEFEF;
+    padding: 4px;
+    border-radius: 30px;
+    margin-bottom: 1.25rem;
+    gap: 4px;
+  }
+
+  .cart-nav-tab {
+    padding: 8px 18px;
+    border-radius: 24px;
+    border: none;
+    background: transparent;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #4B5563;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cart-nav-tab.active {
+    background: #000000;
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  .cart-nav-tab .tab-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: currentColor;
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  .cart-nav-tab:not(.active) .tab-badge {
+    background: #E5E7EB;
+    color: #374151;
+  }
+
+  /* Cart Layout Grid */
+  .cart-grid-container {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  @media (max-width: 991px) {
+    .cart-grid-container {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  /* Main Items Container */
+  .cart-items-card {
+    background: #FFFFFF;
+    border-radius: var(--cart-radius-lg);
+    border: 1px solid var(--cart-card-border);
+    box-shadow: var(--cart-shadow);
+    padding: 1.25rem;
+  }
+
+  /* Individual Cart Item */
+  .cart-item-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #F3F4F6;
+    align-items: center;
+  }
+
+  .cart-item-row:first-child {
+    padding-top: 0;
+  }
+
+  .cart-item-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .cart-item-img {
+    width: 80px;
+    height: 96px;
+    border-radius: var(--cart-radius-md);
+    overflow: hidden;
+    background: #F3F4F6;
+    border: 1px solid #E5E7EB;
+    flex-shrink: 0;
+  }
+
+  .cart-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cart-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cart-item-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--cart-dark);
+    text-decoration: none;
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  .cart-item-title:hover {
+    color: var(--cart-primary-dark);
+  }
+
+  .cart-item-specs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.775rem;
+    color: var(--cart-text-muted);
+  }
+
+  .spec-pill {
+    background: #F3F4F6;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    color: #374151;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  .cart-item-price-unit {
+    font-size: 0.825rem;
+    color: var(--cart-text-muted);
+    font-weight: 600;
+  }
+
+  /* Actions & Qty */
+  .cart-item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .cart-item-total-price {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--cart-primary);
+  }
+
+  .qty-selector {
+    display: inline-flex;
+    align-items: center;
+    background: #F3F4F6;
+    border-radius: 24px;
+    padding: 2px;
+    border: 1px solid #E5E7EB;
+  }
+
+  .qty-btn-action {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: #FFFFFF;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    transition: all 0.15s ease;
+  }
+
+  .qty-btn-action:hover {
+    background: #000000;
+    color: #FFFFFF;
+  }
+
+  .qty-val-input {
+    width: 32px;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--cart-dark);
+    outline: none;
+  }
+
+  .btn-remove-item {
+    background: transparent;
+    border: none;
+    color: #9CA3AF;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-remove-item:hover {
+    background: #FEE2E2;
+    color: #EF4444;
+  }
+
+  /* Personalization Cards Grid */
+  .custom-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .custom-card {
+    background: #FFFFFF;
+    border-radius: var(--cart-radius-lg);
+    border: 1px solid var(--cart-card-border);
+    box-shadow: var(--cart-shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .custom-card-header {
+    padding: 0.85rem 1rem;
+    background: #FAFAFA;
+    border-bottom: 1px solid #F3F4F6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .custom-card-title {
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: var(--cart-dark);
+    margin: 0;
+  }
+
+  .custom-status-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .status-pending { background: #FEF3C7; color: #D97706; }
+  .status-approved { background: #D1FAE5; color: #059669; }
+  .status-accepted { background: #DBEAFE; color: #2563EB; }
+  .status-rejected { background: #FEE2E2; color: #DC2626; }
+
+  .custom-card-body {
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .custom-img-box {
+    border-radius: var(--cart-radius-md);
+    overflow: hidden;
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    aspect-ratio: 3/4;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .custom-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .custom-img-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: #FFFFFF;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 3px;
+  }
+
+  .custom-card-footer {
+    padding: 0.85rem 1rem;
+    background: #FFFFFF;
+    border-top: 1px solid #F3F4F6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: auto;
+  }
+
+  /* Order Summary Sidebar */
+  .summary-sidebar-card {
+    background: #FFFFFF;
+    border-radius: var(--cart-radius-lg);
+    border: 1px solid var(--cart-card-border);
+    box-shadow: var(--cart-shadow);
+    padding: 1.25rem;
+    position: sticky;
+    top: 80px;
+  }
+
+  .summary-heading {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--cart-dark);
+    text-transform: uppercase;
+    letter-spacing: -0.3px;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #F3F4F6;
+  }
+
+  .summary-line-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #4B5563;
+  }
+
+  .summary-divider {
+    height: 1px;
+    background: #E5E7EB;
+    margin: 0.75rem 0;
+  }
+
+  .summary-grand-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .grand-total-label {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--cart-dark);
+    text-transform: uppercase;
+  }
+
+  .grand-total-val {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--cart-primary);
+  }
+
+  .btn-checkout-primary {
+    width: 100%;
+    padding: 12px 18px;
+    background: #000000;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 30px;
+    font-size: 0.875rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-checkout-primary:hover {
+    background: var(--cart-primary-dark);
+    transform: translateY(-1px);
+  }
+
+  /* Free Delivery Banner */
+  .free-shipping-banner {
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
+    border-radius: var(--cart-radius-md);
+    padding: 8px 12px;
+    margin-bottom: 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #065F46;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .free-shipping-banner i {
+    font-size: 1rem;
+    color: #10B981;
+  }
+
+  .guarantee-badges {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid #F3F4F6;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .badge-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.775rem;
+    color: var(--cart-text-muted);
+    font-weight: 500;
+  }
+
+  .badge-item i {
+    color: var(--cart-primary);
+    font-size: 0.85rem;
+  }
+
+  /* Empty State */
+  .cart-empty-box {
+    background: #FFFFFF;
+    border-radius: var(--cart-radius-lg);
+    border: 1px solid var(--cart-card-border);
+    box-shadow: var(--cart-shadow);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+  }
+
+  .empty-bag-icon {
+    width: 70px;
+    height: 70px;
+    background: #ECFDF5;
+    color: var(--cart-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto 1rem;
+  }
+
+  .empty-bag-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--cart-dark);
+    margin-bottom: 0.35rem;
+  }
+
+  .empty-bag-text {
+    color: var(--cart-text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    max-width: 380px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .btn-continue-shopping {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 28px;
+    background: #000000;
+    color: #FFFFFF;
+    border-radius: 24px;
+    font-weight: 800;
+    font-size: 0.825rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-continue-shopping:hover {
+    background: var(--cart-primary);
+    color: #FFFFFF;
+  }
+
+  @media (max-width: 576px) {
+    .cart-page-wrapper {
+      padding: 0.85rem 0 2rem;
+    }
+
+    .cart-item-row {
+      grid-template-columns: 70px 1fr;
+      gap: 0.75rem;
+    }
+    
+    .cart-item-actions {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding-top: 0.35rem;
+      border-top: 1px dashed #F3F4F6;
+    }
+
+    .cart-item-img {
+      width: 70px;
+      height: 84px;
+    }
+  }
+</style>
+
+<div class="cart-page-wrapper">
+  <div class="container" style="max-width: 1140px;">
+    
+    <!-- Header -->
+    <div class="cart-header-box">
+      <h1 class="cart-header-title">Shopping Bag</h1>
+      <p class="cart-header-subtitle">Review items and checkout</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="cart-nav-tabs">
+      <button class="cart-nav-tab active" id="tab-btn-standard" onclick="switchTab('standard')">
+        <i class="fas fa-shopping-bag"></i> Standard Items
+        <span class="tab-badge" id="count-badge-standard">{{ regular_cart_total.total_items|default:0 }}</span>
+      </button>
+      <button class="cart-nav-tab" id="tab-btn-custom" onclick="switchTab('custom')">
+        <i class="fas fa-palette"></i> Personalized Studio
+        <span class="tab-badge" id="count-badge-custom">{{ personalization_requests|length|default:0 }}</span>
+      </button>
+    </div>
+
+    <!-- Tab 1: Standard Cart Items -->
+    <div id="tab-content-standard" class="tab-pane-content">
+      {% if cart_items %}
+      <div class="cart-grid-container">
+        
+        <!-- Items List -->
+        <div class="cart-items-card">
+          {% for item in cart_items %}
+          <div class="cart-item-row" 
+               data-product-id="{{ item.product.id }}"
+               data-size="{{ item.size.code|default_if_none:'' }}" 
+               data-color="{{ item.color.id|default_if_none:'' }}">
+            
+            <!-- Thumbnail -->
+            <div class="cart-item-img">
+              {% if item.product.image and item.product.image.url %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+              {% else %}
+                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-muted">
+                  <i class="fas fa-image"></i>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Info -->
+            <div class="cart-item-info">
+              <a href="{% url 'store:product_detail' item.product.id %}" class="cart-item-title">
+                {{ item.product.name }}
+              </a>
+              
+              <div class="cart-item-specs">
+                {% if item.size %}
+                  <span class="spec-pill">Size: {{ item.size.code }}</span>
+                {% endif %}
+                
+                {% if item.color %}
+                  <span class="spec-pill">
+                    <span class="color-dot" style="background-color: {{ item.color.hex_code }};"></span>
+                    {{ item.color.name }}
+                  </span>
+                {% endif %}
+              </div>
+
+              <div class="cart-item-price-unit">₹{{ item.product.price }}</div>
+            </div>
+
+            <!-- Actions & Price -->
+            <div class="cart-item-actions">
+              <button class="btn-remove-item delete-btn" 
+                      data-product-id="{{ item.product.id }}"
+                      data-size="{{ item.size.code|default_if_none:'' }}" 
+                      data-color="{{ item.color.id|default_if_none:'' }}"
+                      title="Remove item">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+
+              <div class="qty-selector">
+                <button class="qty-btn-action qty-decrease" 
+                        data-product-id="{{ item.product.id }}"
+                        data-size="{{ item.size.code|default_if_none:'' }}" 
+                        data-color="{{ item.color.id|default_if_none:'' }}">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" class="qty-val-input qty-input" value="{{ item.quantity }}" min="1"
+                       data-product-id="{{ item.product.id }}" 
+                       data-size="{{ item.size.code|default_if_none:'' }}"
+                       data-color="{{ item.color.id|default_if_none:'' }}">
+                <button class="qty-btn-action qty-increase" 
+                        data-product-id="{{ item.product.id }}"
+                        data-size="{{ item.size.code|default_if_none:'' }}" 
+                        data-color="{{ item.color.id|default_if_none:'' }}">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+
+              <div class="cart-item-total-price item-total">₹{{ item.total_price }}</div>
+            </div>
+
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Order Summary Sidebar -->
+        <div class="summary-sidebar-card">
+          <h3 class="summary-heading">Order Summary</h3>
+
+          {% if delivery_info.is_free_delivery %}
+          <div class="free-shipping-banner">
+            <i class="fas fa-shipping-fast"></i>
+            <span>You've unlocked <strong>FREE Shipping!</strong></span>
+          </div>
+          {% else %}
+          <div class="free-shipping-banner" style="background: #FEF3C7; border-color: #FDE68A; color: #92400E;">
+            <i class="fas fa-truck-loading" style="color: #D97706;"></i>
+            <span>Add ₹{{ delivery_info.amount_needed_for_free_delivery }} more for FREE delivery</span>
+          </div>
+          {% endif %}
+
+          <div class="summary-line-item">
+            <span>Items Subtotal</span>
+            <span class="cart-total-price">₹{{ regular_cart_total.total_price }}</span>
+          </div>
+
+          {% if personalization_cart_total > 0 %}
+          <div class="summary-line-item">
+            <span>Custom Studio Items</span>
+            <span>₹{{ personalization_cart_total }}</span>
+          </div>
+          {% endif %}
+
+          <div class="summary-line-item">
+            <span>Estimated Delivery</span>
+            {% if delivery_info.is_free_delivery %}
+              <span class="text-success fw-bold">FREE</span>
+            {% else %}
+              <span>₹{{ delivery_info.delivery_charge }}</span>
+            {% endif %}
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-grand-total">
+            <span class="grand-total-label">Total Amount</span>
+            <span class="grand-total-val">₹{{ cart_total.total_price|add:delivery_info.delivery_charge }}</span>
+          </div>
+
+          <button class="btn-checkout-primary" onclick="proceedToCheckout()">
+            Proceed to Checkout <i class="fas fa-arrow-right"></i>
+          </button>
+
+          <div class="guarantee-badges">
+            <div class="badge-item">
+              <i class="fas fa-shield-alt"></i> 256-Bit SSL Encrypted Checkout
+            </div>
+            <div class="badge-item">
+              <i class="fas fa-undo"></i> 7-Day Hassle Free Returns
+            </div>
+            <div class="badge-item">
+              <i class="fas fa-check-circle"></i> 100% Authentic Quality
+            </div>
+          </div>
+        </div>
+
+      </div>
+      {% else %}
+      <!-- Empty Standard Cart -->
+      <div class="cart-empty-box">
+        <div class="empty-bag-icon">
+          <i class="fas fa-shopping-bag"></i>
+        </div>
+        <h2 class="empty-bag-title">Your shopping bag is empty</h2>
+        <p class="empty-bag-text">Explore our collection of custom t-shirts, oversized hoodies, and apparel.</p>
+        <a href="{% url 'store:all_products' %}" class="btn-continue-shopping">
+          Start Shopping <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Tab 2: Personalization Studio Requests -->
+    <div id="tab-content-custom" class="tab-pane-content" style="display: none;">
+      {% if personalization_requests %}
+      <div class="cart-grid-container">
+        
+        <!-- Cards Grid -->
+        <div class="custom-cards-grid">
+          {% for request in personalization_requests %}
+          <div class="custom-card" data-request-id="{{ request.id }}">
+            <div class="custom-card-header">
+              <h4 class="custom-card-title">{{ request.product.name }}</h4>
+              {% if request.status == 'pending' %}
+                <span class="custom-status-badge status-pending"><i class="fas fa-hourglass-half me-1"></i> Under Review</span>
+              {% elif request.status == 'admin_approved' %}
+                <span class="custom-status-badge status-approved"><i class="fas fa-check-circle me-1"></i> Design Approved</span>
+              {% elif request.status == 'order_accepted' %}
+                <span class="custom-status-badge status-accepted"><i class="fas fa-shopping-bag me-1"></i> In Cart</span>
+              {% elif request.status == 'rejected' %}
+                <span class="custom-status-badge status-rejected"><i class="fas fa-times-circle me-1"></i> Rejected</span>
+              {% endif %}
+            </div>
+
+            <div class="custom-card-body">
+              <!-- Production Mockup / Main Preview -->
+              <div class="custom-img-box" onclick="showImageModal('{% if request.admin_final_image %}{{ request.admin_final_image.url }}{% else %}{{ request.product.image.url }}{% endif %}', 'Production Preview')">
+                {% if request.admin_final_image %}
+                  <img src="{{ request.admin_final_image.url }}" alt="Mockup">
+                  <div class="custom-img-label">Studio Mockup</div>
+                {% else %}
+                  <img src="{{ request.product.image.url }}" alt="{{ request.product.name }}">
+                  <div class="custom-img-label">Base Item</div>
+                {% endif %}
+              </div>
+
+              <!-- Uploaded Design Thumb & Specs -->
+              <div class="d-flex flex-column gap-2">
+                <div class="custom-img-box" style="aspect-ratio: 1;" onclick="showImageModal('{% if request.uploaded_image %}{{ request.uploaded_image.url }}{% endif %}', 'Your Design')">
+                  {% if request.uploaded_image %}
+                    <img src="{{ request.uploaded_image.url }}" alt="Uploaded Design">
+                    <div class="custom-img-label">Your Upload</div>
+                  {% else %}
+                    <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-muted small">No Design</div>
+                  {% endif %}
+                </div>
+
+                {% if request.size %}
+                  <div class="spec-pill" style="font-size: 0.7rem;"><i class="fas fa-ruler-combined"></i> Size: {{ request.size.code }}</div>
+                {% endif %}
+
+                {% if request.admin_notes %}
+                  <div class="p-2 rounded bg-light border text-muted" style="font-size: 0.7rem; line-height: 1.25;">
+                    <strong class="text-dark">Feedback:</strong> {{ request.admin_notes }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="custom-card-footer">
+              <div class="fw-bold text-success fs-6">₹{{ request.product.price }}</div>
+
+              <div>
+                {% if request.status == 'admin_approved' %}
+                  <button class="btn btn-sm btn-dark fw-bold rounded-pill px-3 me-1" onclick="approvePersonalization('{{ request.id }}')">
+                    <i class="fas fa-cart-plus me-1"></i> Approve & Buy
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger rounded-circle per-btn-delete" data-request-id="{{ request.id }}" title="Cancel">
+                    <i class="fas fa-times"></i>
+                  </button>
+                {% elif request.status == 'pending' %}
+                  <span class="badge bg-light text-muted border p-1">Reviewing...</span>
+                  <button class="btn btn-sm btn-link text-danger per-btn-delete ms-1" data-request-id="{{ request.id }}">Cancel</button>
+                {% elif request.status == 'order_accepted' %}
+                  <div class="qty-selector me-2" style="display: inline-flex;">
+                    <button class="qty-btn-action qty-decrease" data-request-id="{{ request.id }}"><i class="fas fa-minus"></i></button>
+                    <input type="number" class="qty-val-input qty-input" value="{{ request.cart_quantity }}" min="1" data-request-id="{{ request.id }}">
+                    <button class="qty-btn-action qty-increase" data-request-id="{{ request.id }}"><i class="fas fa-plus"></i></button>
+                  </div>
+                  <button class="btn-remove-item per-btn-delete" data-request-id="{{ request.id }}" title="Remove"><i class="fas fa-trash-alt"></i></button>
+                {% else %}
+                  <button class="btn btn-sm btn-outline-danger per-btn-delete" data-request-id="{{ request.id }}">Remove</button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Order Summary Sidebar for Custom Requests -->
+        <div class="summary-sidebar-card">
+          <h3 class="summary-heading">Order Summary</h3>
+
+          <div class="summary-line-item">
+            <span>Custom Studio Items</span>
+            <span>₹{{ personalization_cart_total }}</span>
+          </div>
+
+          {% if regular_cart_total.total_price > 0 %}
+          <div class="summary-line-item">
+            <span>Standard Items</span>
+            <span>₹{{ regular_cart_total.total_price }}</span>
+          </div>
+          {% endif %}
+
+          <div class="summary-line-item">
+            <span>Estimated Delivery</span>
+            {% if delivery_info.is_free_delivery %}
+              <span class="text-success fw-bold">FREE</span>
+            {% else %}
+              <span>₹{{ delivery_info.delivery_charge }}</span>
+            {% endif %}
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-grand-total">
+            <span class="grand-total-label">Total Amount</span>
+            <span class="grand-total-val">₹{{ cart_total.total_price|add:delivery_info.delivery_charge }}</span>
+          </div>
+
+          <button class="btn-checkout-primary" onclick="proceedToCheckout()">
+            Proceed to Checkout <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>
+      {% else %}
+      <div class="cart-empty-box">
+        <div class="empty-bag-icon">
+          <i class="fas fa-palette"></i>
+        </div>
+        <h2 class="empty-bag-title">No Studio Customizations</h2>
+        <p class="empty-bag-text">Upload your own artwork or logos to create unique personalized apparel!</p>
+        <a href="{% url 'store:personalize_products' %}" class="btn-continue-shopping">
+          Start Personalizing <i class="fas fa-magic ms-1"></i>
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  // CSRF Token Helper
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  const csrftoken = getCookie('csrftoken');
+
+  // Checkout navigation function
+  function proceedToCheckout() {
+    window.location.href = '{% url "store:checkout" %}';
+  }
+
+  // Tab switching function
+  function switchTab(tabName) {
+    const btnStandard = document.getElementById('tab-btn-standard');
+    const btnCustom = document.getElementById('tab-btn-custom');
+    const contentStandard = document.getElementById('tab-content-standard');
+    const contentCustom = document.getElementById('tab-content-custom');
+
+    if (tabName === 'standard' || tabName === 'cart-items') {
+      btnStandard.classList.add('active');
+      btnCustom.classList.remove('active');
+      contentStandard.style.display = 'block';
+      contentCustom.style.display = 'none';
+    } else {
+      btnCustom.classList.add('active');
+      btnStandard.classList.remove('active');
+      contentCustom.style.display = 'block';
+      contentStandard.style.display = 'none';
+    }
+  }
+
+  // Toast notification system
+  function showToast(message, type = 'success') {
+    document.querySelectorAll('.cart-toast').forEach(toast => toast.remove());
+
+    const toast = document.createElement('div');
+    toast.className = `cart-toast position-fixed bottom-0 end-0 m-3 p-2 px-3 bg-${type === 'error' ? 'danger' : 'success'} text-white rounded-3 shadow-sm`;
+    toast.style.zIndex = '9999';
+    toast.style.fontSize = '0.85rem';
+    toast.style.fontWeight = '600';
+    toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'} me-2"></i> ${message}`;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }, 2500);
+  }
+
+  // Image modal function
+  function showImageModal(imageUrl, title) {
+    if (!imageUrl) return;
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:99999;backdrop-filter:blur(4px);';
+    modal.innerHTML = `
+      <div style="position:relative;max-width:90%;max-height:90%;background:#ffffff;border-radius:12px;padding:1rem;box-shadow:0 10px 30px rgba(0,0,0,0.25);">
+        <button onclick="this.closest('[style*=fixed]').remove()" style="position:absolute;top:0.75rem;right:0.75rem;background:#F3F4F6;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <i class="fas fa-times"></i>
+        </button>
+        <img src="${imageUrl}" style="max-width:100%;max-height:75vh;border-radius:8px;object-fit:contain;">
+        <p style="text-align:center;margin-top:0.75rem;font-weight:700;font-size:0.9rem;color:#111827;">${title}</p>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  }
+
+  // Cart API Updates
+  function updateCartItem(productId, quantity, sizeOverride = null, colorOverride = null) {
+    const containerSelector = `[data-product-id="${productId}"]${sizeOverride ? `[data-size="${sizeOverride}"]` : ''}${colorOverride ? `[data-color="${colorOverride}"]` : ''}`;
+    const container = document.querySelector(containerSelector);
+    const size = sizeOverride !== null ? sizeOverride : (container ? (container.getAttribute('data-size') || null) : null);
+    const color = colorOverride !== null ? colorOverride : (container ? (container.getAttribute('data-color') || null) : null);
+
+    fetch('{% url "store:update_cart_ajax" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({
+        product_id: productId,
+        quantity: parseInt(quantity),
+        size: size,
+        color: color
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          if (data.item_removed) {
+            if (container) container.remove();
+            showToast('Item removed from bag');
+          } else {
+            const totalElement = document.querySelector(`${containerSelector} .item-total`);
+            if (totalElement) totalElement.textContent = `₹${data.item.total_price}`;
+            showToast('Bag updated successfully');
+          }
+          updateCartTotals(data.cart_total);
+          if (document.querySelectorAll('.cart-item-row').length === 0) location.reload();
+        } else {
+          showToast(data.error || 'Error updating cart', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Network error. Please try again.', 'error');
+      });
+  }
+
+  function removeCartItem(productId, sizeOverride = null, colorOverride = null) {
+    if (!confirm('Are you sure you want to remove this item from your bag?')) return;
+    const containerSelector = `[data-product-id="${productId}"]${sizeOverride ? `[data-size="${sizeOverride}"]` : ''}${colorOverride ? `[data-color="${colorOverride}"]` : ''}`;
+    const container = document.querySelector(containerSelector);
+    const size = sizeOverride !== null ? sizeOverride : (container ? (container.getAttribute('data-size') || null) : null);
+    const color = colorOverride !== null ? colorOverride : (container ? (container.getAttribute('data-color') || null) : null);
+
+    fetch('{% url "store:remove_from_cart_ajax" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({ product_id: productId, size: size, color: color })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          if (container) container.remove();
+          showToast('Item removed from bag');
+          updateCartTotals(data.cart_total);
+          if (document.querySelectorAll('.cart-item-row').length === 0) location.reload();
+        } else {
+          showToast(data.error || 'Error removing item', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Network error. Please try again.', 'error');
+      });
+  }
+
+  function updateCartTotals(cartTotal) {
+    document.querySelectorAll('.cart-total-price').forEach(el => {
+      el.textContent = `₹${cartTotal.total_price}`;
+    });
+    const cartBadge = document.querySelector('#cartBadge');
+    if (cartBadge) {
+      cartBadge.textContent = cartTotal.total_items;
+      cartBadge.style.display = (cartTotal.total_items && cartTotal.total_items > 0) ? 'inline-block' : 'none';
+    }
+    const standardBadge = document.querySelector('#count-badge-standard');
+    if (standardBadge) {
+      standardBadge.textContent = cartTotal.total_items || 0;
+    }
+  }
+
+  function approvePersonalization(requestId) {
+    if (!confirm('Approve this design and move it to your bag?')) return;
+
+    fetch('{% url "store:approve_personalization" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({ request_id: requestId })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Design approved and ready in bag!');
+          setTimeout(() => location.reload(), 600);
+        } else {
+          showToast(data.error || 'Error approving design', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Network error. Please try again.', 'error');
+      });
+  }
+
+  function updatePersonalizationQuantity(requestId, quantity) {
+    fetch('{% url "store:update_personalization_cart_quantity" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({ request_id: requestId, quantity: parseInt(quantity) })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          if (data.item_removed) {
+            const card = document.querySelector(`[data-request-id="${requestId}"]`);
+            if (card) card.remove();
+            showToast('Item removed');
+          } else {
+            showToast('Updated successfully');
+          }
+          if (data.combined_cart_total) {
+            updateCartTotals(data.combined_cart_total);
+          }
+        } else {
+          showToast(data.error || 'Error updating quantity', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Network error. Please try again.', 'error');
+      });
+  }
+
+  function removePersonalizationFromCart(requestId) {
+    if (!confirm('Remove this custom design from your bag?')) return;
+
+    fetch('{% url "store:remove_personalization_from_cart" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({ request_id: requestId })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const card = document.querySelector(`[data-request-id="${requestId}"]`);
+          if (card) card.remove();
+          showToast('Custom item removed');
+          if (data.combined_cart_total) {
+            updateCartTotals(data.combined_cart_total);
+          }
+        } else {
+          showToast(data.error || 'Error removing custom item', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Network error. Please try again.', 'error');
+      });
+  }
+
+  // Initialize event listeners
+  function initializeCartListeners() {
+    // Decrease buttons
+    document.querySelectorAll('.qty-decrease[data-product-id]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const pId = btn.dataset.productId;
+        const size = btn.getAttribute('data-size') || "";
+        const color = btn.getAttribute('data-color') || "";
+        const input = document.querySelector(`[data-product-id="${pId}"][data-size="${size}"][data-color="${color}"] .qty-input`);
+        if (!input) return;
+        const newVal = Math.max(1, (parseInt(input.value) || 1) - 1);
+        input.value = newVal;
+        updateCartItem(pId, newVal, size || null, color || null);
+      });
+    });
+
+    // Increase buttons
+    document.querySelectorAll('.qty-increase[data-product-id]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const pId = btn.dataset.productId;
+        const size = btn.getAttribute('data-size') || "";
+        const color = btn.getAttribute('data-color') || "";
+        const input = document.querySelector(`[data-product-id="${pId}"][data-size="${size}"][data-color="${color}"] .qty-input`);
+        if (!input) return;
+        const newVal = (parseInt(input.value) || 1) + 1;
+        input.value = newVal;
+        updateCartItem(pId, newVal, size || null, color || null);
+      });
+    });
+
+    // Delete buttons
+    document.querySelectorAll('.delete-btn[data-product-id]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const pId = btn.dataset.productId;
+        const size = btn.getAttribute('data-size') || "";
+        const color = btn.getAttribute('data-color') || "";
+        removeCartItem(pId, size || null, color || null);
+      });
+    });
+
+    // Qty input change
+    document.querySelectorAll('.qty-input[data-product-id]').forEach(input => {
+      input.addEventListener('change', () => {
+        const pId = input.dataset.productId;
+        const size = input.getAttribute('data-size') || null;
+        const color = input.getAttribute('data-color') || null;
+        let qty = parseInt(input.value);
+        if (isNaN(qty) || qty < 1) {
+          qty = 1;
+          input.value = 1;
+        }
+        updateCartItem(pId, qty, size, color);
+      });
+    });
+
+    // Personalization qty decrease
+    document.querySelectorAll('.qty-decrease[data-request-id]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const reqId = btn.dataset.requestId;
+        const input = document.querySelector(`[data-request-id="${reqId}"] .qty-input`);
+        if (!input) return;
+        const newVal = Math.max(0, (parseInt(input.value) || 1) - 1);
+        input.value = newVal;
+        updatePersonalizationQuantity(reqId, newVal);
+      });
+    });
+
+    // Personalization qty increase
+    document.querySelectorAll('.qty-increase[data-request-id]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const reqId = btn.dataset.requestId;
+        const input = document.querySelector(`[data-request-id="${reqId}"] .qty-input`);
+        if (!input) return;
+        const newVal = (parseInt(input.value) || 1) + 1;
+        input.value = newVal;
+        updatePersonalizationQuantity(reqId, newVal);
+      });
+    });
+
+    // Personalization delete
+    document.querySelectorAll('.per-btn-delete[data-request-id]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const reqId = btn.dataset.requestId;
+        removePersonalizationFromCart(reqId);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initializeCartListeners);
+</script>
+{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'emails/base_email.html' %}
+
+{% block email_content %}
+<div style="text-align: center; margin-bottom: 30px;">
+    <div style="font-size: 50px; margin-bottom: 20px;">🔐</div>
+    <h1 style="margin: 0; font-size: 24px; font-weight: 800; text-transform: uppercase;">Verification Code</h1>
+</div>
+
+<p>Hi {{ user.username }},</p>
+
+<p>Use the following code to complete your login or verification process on Customise Clothing. This code is valid for 10 minutes.</p>
+
+<div style="text-align: center; margin: 40px 0; background-color: #fafafa; border: 2px dashed #000; padding: 30px; border-radius: 8px;">
+    <span style="font-size: 42px; font-weight: 900; letter-spacing: 12px; color: #000;">{{ otp }}</span>
+</div>
+
+<p style="color: #666; font-size: 14px; text-align: center;">If you didn't request this code, you can safely ignore this email.</p>
+
+<p style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">Need help? Contact our support team at {{ site_contact_email|default:"customiseclothingofficial@gmail.com" }}</p>
+{% endblock %}

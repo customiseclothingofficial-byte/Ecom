@@ -1,0 +1,866 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Customise Clothing - Your Online Store{% endblock %}
+
+{% block content %}
+<style>
+    /* Exact VEIRDO Style Homepage */
+    /* Exact VEIRDO Style Homepage */
+    .veirdo-homepage {
+        background: #FFFFFF;
+        padding-bottom: 40px;
+    }
+
+    /* Category Circles */
+    .category-container {
+        padding: 20px 15px;
+        white-space: nowrap;
+        overflow-x: auto;
+        background: #fff;
+        display: flex;
+        gap: 15px;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .category-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-item {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        width: 75px;
+        text-align: center;
+        transition: transform 0.2s;
+    }
+
+    .category-item:hover {
+        transform: translateY(-2px);
+    }
+
+    .category-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 2px solid var(--veirdo-blue);
+        padding: 3px;
+        margin-bottom: 8px;
+        overflow: hidden;
+    }
+
+    .category-circle img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .category-name {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--veirdo-black);
+        white-space: pre-wrap;
+        line-height: 1.2;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Layout Blocks */
+    .container-veirdo {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    .section-veirdo {
+        padding: 20px 0 10px;
+        background: #FFFFFF;
+    }
+
+    .section-veirdo-grey {
+        padding: 20px 0 10px;
+        background: #F9FAFB;
+    }
+
+    .section-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--veirdo-black);
+        margin-bottom: 25px;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .section-title .view-all {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--veirdo-blue);
+        text-decoration: none;
+    }
+
+    /* Exact Veirdo 2-col Product Grid */
+    .product-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        /* 2 columns for mobile by default */
+        gap: 12px;
+        padding: 0 15px 15px;
+    }
+
+    @media (min-width: 768px) {
+        .product-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+            padding: 0 20px 20px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .product-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+            /* Locked to exactly 3 columns for large premium cards */
+        }
+
+        .category-container {
+            flex-wrap: wrap;
+            /* Ensure categories wrap instead of scrolling horizontally if too many */
+            justify-content: center;
+            overflow: hidden;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .product-grid {
+            grid-template-columns: 1fr 1fr !important;
+            /* Double check 2 columns here */
+        }
+
+        .veirdo-shop-layout {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .veirdo-main-grid {
+            width: 100%;
+        }
+    }
+
+    @media (min-width: 1400px) {
+        .product-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+            /* Never exceed 3 columns */
+        }
+    }
+
+    /* The EXACT Veirdo Card Styling from Screenshot */
+    .veirdo-product-card {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        background: transparent;
+        border: none;
+        transition: transform 0.2s;
+    }
+
+    .veirdo-product-image-container {
+        position: relative;
+        width: 100%;
+        padding-top: 133%;
+        /* 3:4 aspect ratio */
+        background: #f4f4f4;
+        border-radius: 8px;
+        /* Rounded corners on image container! */
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+
+    /* Slider styling */
+    .hero-slider-inner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        overflow-x: hidden;
+        /* Prevent manual scrolling / scrollbars completely */
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .hero-slider-inner::-webkit-scrollbar {
+        display: none;
+        /* Hide scrollbar for Chrome/Safari */
+    }
+
+    .veirdo-product-image {
+        min-width: 100%;
+        height: 100%;
+        object-fit: cover;
+        scroll-snap-align: start;
+    }
+
+    .slider-dots {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 4px;
+        pointer-events: none;
+        z-index: 5;
+    }
+
+    .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    .dot.active {
+        background: #fff;
+        width: 12px;
+        border-radius: 10px;
+    }
+
+    .veirdo-rating {
+        position: absolute;
+        bottom: 8px;
+        /* Bottom left */
+        left: 8px;
+        background: rgba(0, 0, 0, 0.4);
+        /* Translucent dark overlay */
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #fff;
+    }
+
+    .veirdo-rating i {
+        color: #FF8A65;
+        /* Coral orange star */
+        font-size: 10px;
+    }
+
+    .veirdo-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        /* Top left */
+        background: #fff;
+        color: var(--veirdo-green);
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .veirdo-color-swatch {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background: rgba(255, 255, 255, 0.75);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #000;
+    }
+
+    .veirdo-color-swatch .swatch-circle {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .veirdo-product-info {
+        padding: 2px 0;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    /* Re-enable product names and style them nicely */
+    .veirdo-product-brand {
+        display: none !important;
+    }
+
+    .veirdo-product-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #6b7280;
+        /* Light grey/muted black text for name */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 6px;
+    }
+
+    .veirdo-price-row {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 2px;
+    }
+
+    .veirdo-price {
+        font-weight: 800;
+        color: var(--veirdo-black);
+        font-size: 16px;
+    }
+
+    .veirdo-old-price {
+        text-decoration: line-through;
+        color: #9ca3af;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .veirdo-discount {
+        color: var(--veirdo-green);
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .veirdo-best-price {
+        color: var(--veirdo-green);
+        font-size: 12px;
+        font-weight: 800;
+        margin-top: 2px;
+        margin-bottom: 6px;
+    }
+
+    .veirdo-best-price i {
+        font-size: 10px;
+    }
+
+    .veirdo-add-to-cart {
+        width: 100%;
+        background: #fff;
+        border: 1px solid #eaeaea;
+        color: var(--veirdo-black);
+        padding: 8px;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 11px;
+        border-radius: 4px;
+        transition: all 0.2s;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .veirdo-add-to-cart:hover {
+        background: var(--veirdo-black);
+        color: #fff;
+    }
+
+    /* Hero Banners */
+    .veirdo-hero {
+        position: relative;
+        width: 100%;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+    }
+
+    .hero-large {
+        min-height: 380px;
+    }
+
+    .hero-medium {
+        min-height: 280px;
+    }
+
+    @media (max-width: 768px) {
+        .hero-large {
+            min-height: 260px;
+        }
+
+        .hero-medium {
+            min-height: 200px;
+        }
+
+        .veirdo-hero-title {
+            font-size: 32px !important;
+        }
+    }
+
+    .veirdo-hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 40px 20px;
+        max-width: 600px;
+    }
+
+    .veirdo-hero-tag {
+        background: var(--veirdo-yellow);
+        color: #000;
+        display: inline-block;
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+    }
+
+    .veirdo-hero-title {
+        color: #fff;
+        font-size: 42px;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+    }
+
+    .veirdo-hero-desc {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 30px;
+    }
+
+    .veirdo-btn-primary {
+        background: var(--veirdo-black);
+        color: #fff;
+        border: none;
+        padding: 14px 32px;
+        font-size: 14px;
+        font-weight: 800;
+        text-transform: uppercase;
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.2s;
+    }
+
+    .veirdo-btn-primary:hover {
+        transform: translateY(-2px);
+        color: #fff;
+    }
+
+    /* Sidebar Layout from Screenshot */
+    .veirdo-shop-layout {
+        display: flex;
+        gap: 30px;
+        padding-top: 20px;
+        align-items: flex-start;
+    }
+
+    .veirdo-sidebar {
+        flex: 0 0 250px;
+        position: sticky;
+        top: 80px;
+    }
+
+    .filters-title {
+        font-size: 15px;
+        font-weight: 800;
+        margin-bottom: 25px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .filter-section {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eaeaea;
+        padding-bottom: 15px;
+    }
+
+    .filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 16px;
+        font-weight: 700;
+        color: #000;
+        cursor: pointer;
+        padding: 5px 0;
+    }
+
+    .filter-body {
+        margin-top: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .filter-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        color: #4b5563;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .filter-option input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        accent-color: var(--veirdo-black);
+        cursor: pointer;
+    }
+
+    .color-dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: inline-block;
+        border: 1px solid #ddd;
+    }
+
+    .veirdo-main-grid {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Mobile Filter Button */
+    .mobile-filter-btn {
+        position: fixed;
+        bottom: 85px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--veirdo-black);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 14px;
+        z-index: 1045;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        display: none;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    @media (max-width: 991px) {
+        .mobile-filter-btn {
+            display: flex;
+        }
+    }
+
+    .offcanvas-filters {
+        padding: 20px;
+    }
+</style>
+
+<div class="veirdo-homepage">
+
+
+    <!-- Main Hero Banner -->
+    <div class="veirdo-hero hero-large"
+        style="background-image: url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=1600&auto=format&fit=crop');">
+        <div
+            style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 80%);">
+        </div>
+        <div class="container-veirdo w-100">
+            <div class="veirdo-hero-content text-left" style="max-width: 550px; padding-left: 20px;">
+                <h3 style="color:#12B76A; font-size:16px; font-weight:800; letter-spacing:1.5px; margin-bottom:10px;">
+                    PREMIUM QUALITY CUSTOM TEES</h3>
+                <h1 class="veirdo-hero-title"
+                    style="font-size: 52px; color: #fff; margin-bottom: 0px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
+                    DESIGN YOUR</h1>
+                <h1 class="veirdo-hero-title"
+                    style="font-size: 52px; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">OWN <span
+                        style="color:#00A360;">VIBE</span></h1>
+                <p style="color: #ddd; font-size: 16px; margin-bottom: 25px; font-weight: 500;">Bring your ideas to life
+                    with our high-quality custom printing. Express yourself.</p>
+                <div class="mt-2">
+                    <a href="{% url 'store:personalize_products' %}" class="veirdo-btn-primary"
+                        style="background: #12B76A; border-radius: 40px; padding: 14px 35px; font-size: 14px;">CUSTOMISE
+                        NOW</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Layout (Sidebar + Grid) exactly like Screenshot -->
+    <div class="veirdo-shop-layout container-veirdo mt-4 pb-5 px-3 px-lg-0">
+
+        <!-- Sidebar -->
+        <aside class="veirdo-sidebar d-none d-lg-block">
+            <form action="{% url 'store:home' %}" method="get" id="filterForm">
+                <!-- Keep search query if exists -->
+                {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="filters-title mb-0">FILTERS</h5>
+                    <a href="{% url 'store:home' %}" class="text-muted small text-decoration-none">Clear All</a>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-header" onclick="toggleFilter(this)">
+                        <span>Size</span>
+                        <i class="fas fa-chevron-up" style="font-size: 12px;"></i>
+                    </div>
+                    <div class="filter-body">
+                        {% for size in all_sizes %}
+                        <label class="filter-option">
+                            <input type="checkbox" name="size" value="{{ size.code }}" onchange="this.form.submit()" {% if size.code in selected_sizes %}checked{% endif %}>
+                            {{ size.code }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-header" onclick="toggleFilter(this)">
+                        <span>Price</span>
+                        <i class="fas fa-chevron-up" style="font-size: 12px;"></i>
+                    </div>
+                    <div class="filter-body">
+                        <div style="font-size: 12px; color: #6b7280;">Max Price</div>
+                        <div style="font-size: 15px; font-weight: 700; color: #000;">₹<span id="priceValue">{{ current_max_price }}</span></div>
+                        <input type="range" name="price" class="form-range mt-2" min="0" max="2000" step="50"
+                            value="{{ current_max_price }}"
+                            oninput="document.getElementById('priceValue').textContent = this.value"
+                            onchange="this.form.submit()" style="accent-color: var(--veirdo-purple);">
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-header" onclick="toggleFilter(this)">
+                        <span>Color</span>
+                        <i class="fas fa-chevron-up" style="font-size: 12px;"></i>
+                    </div>
+                    <div class="filter-body">
+                        {% for color in all_colors %}
+                        <label class="filter-option">
+                            <input type="checkbox" name="color" value="{{ color.id }}" onchange="this.form.submit()" {% if color.id in selected_colors %}checked{% endif %}>
+                            <span class="color-dot" style="background:{{ color.hex_code }};"></span>
+                            {{ color.name }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </form>
+        </aside>
+
+        <!-- Mobile Filter Button -->
+        <button class="mobile-filter-btn d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#mobileFilterOffcanvas">
+            <i class="fas fa-sliders-h"></i> Filters
+            {% if selected_sizes|length or selected_colors|length %}
+            <span class="badge bg-success rounded-circle" style="font-size: 10px;">{{
+                selected_sizes|length|add:selected_colors|length }}</span>
+            {% endif %}
+        </button>
+
+        <!-- Mobile Filter Offcanvas -->
+        <div class="offcanvas offcanvas-bottom" tabindex="-1" id="mobileFilterOffcanvas"
+            style="height: 80vh; border-radius: 20px 20px 0 0;">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title fw-bold">FILTERS</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <form action="{% url 'store:home' %}" method="get">
+                    {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+
+                    <div class="filter-section mt-0">
+                        <div class="filter-header" onclick="toggleFilter(this)">
+                            <span>Size</span>
+                            <i class="fas fa-chevron-up" style="font-size: 12px;"></i>
+                        </div>
+                        <div class="filter-body">
+                            {% for size in all_sizes %}
+                            <label class="filter-option">
+                                <input type="checkbox" name="size" value="{{ size.code }}" {% if size.code in selected_sizes %}checked{% endif %}>
+                                {{ size.code }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <div class="filter-header" onclick="toggleFilter(this)">
+                            <span>Price Range</span>
+                            <i class="fas fa-chevron-up" style="font-size: 12px;"></i>
+                        </div>
+                        <div class="filter-body">
+                            <div style="font-size: 15px; font-weight: 700; color: #000;">Max: ₹<span
+                                    id="priceValueMobile">{{ current_max_price }}</span></div>
+                            <input type="range" name="price" class="form-range mt-2" min="0" max="2000" step="50"
+                                value="{{ current_max_price }}"
+                                oninput="document.getElementById('priceValueMobile').textContent = this.value">
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <div class="filter-header" onclick="toggleFilter(this)">
+                            <span>Color</span>
+                            <i class="fas fa-chevron-up" style="font-size: 12px;"></i>
+                        </div>
+                        <div class="filter-body">
+                            {% for color in all_colors %}
+                            <label class="filter-option">
+                                <input type="checkbox" name="color" value="{{ color.id }}" {% if color.id in selected_colors %}checked{% endif %}>
+                                <span class="color-dot" style="background:{{ color.hex_code }};"></span>
+                                {{ color.name }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="sticky-bottom bg-white py-3 border-top mt-4" style="margin: 0 -15px -15px;">
+                        <div class="d-flex gap-2 px-3">
+                            <a href="{% url 'store:home' %}"
+                                class="btn btn-outline-dark flex-grow-1 py-2 fw-bold">CLEAR</a>
+                            <button type="submit" class="btn btn-dark flex-grow-1 py-2 fw-bold">APPLY FILTERS</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main Product Grid -->
+        <main class="veirdo-main-grid">
+            <div class="product-grid" style="padding: 0;">
+                <!-- Real Products List (All products shown dynamically) -->
+                {% for product in products %}
+                <article class="veirdo-product-card">
+                    <a href="{% url 'store:product_detail' product.id %}" class="text-decoration-none">
+                        <div class="veirdo-product-image-container">
+                            <div class="hero-slider-inner">
+                                {% if product.images.all %}
+                                {% for pi in product.images.all %}
+                                <img src="{{ pi.image.url }}" class="veirdo-product-image" alt="{{ product.name }}">
+                                {% endfor %}
+                                {% elif product.image %}
+                                <img src="{{ product.image.url }}" class="veirdo-product-image"
+                                    alt="{{ product.name }}">
+                                {% else %}
+                                <img src="{{ site_product_fallback_image }}"
+                                    class="veirdo-product-image" alt="Demo">
+                                {% endif %}
+                            </div>
+
+                            {% if product.images.all|length > 1 %}
+                            <div class="slider-dots">
+                                <span class="dot active"></span>
+                                {% for i in product.images.all|slice:"1:" %}<span class="dot"></span>{% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <div class="veirdo-rating"><i class="fas fa-star"></i> 4.5</div>
+                            <div class="veirdo-badge">BEST SELLER</div>
+                            {% if product.colors.exists %}
+                            <div class="veirdo-color-swatch">
+                                <span class="swatch-circle"
+                                    style="background:{{ product.colors.first.hex_code }};"></span>
+                                {% with count=product.colors.count %}
+                                {% if count > 1 %}{{ count }}{% else %}1{% endif %}
+                                {% endwith %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="veirdo-product-info">
+                            <div class="veirdo-product-brand">CUSTOMISE CLOTHING</div>
+                            <div class="veirdo-product-name">{{ product.name }}</div>
+                            <div class="veirdo-price-row">
+                                <span class="veirdo-price">₹{{ product.price }}</span>
+                                {% if product.original_price %}
+                                <span class="veirdo-old-price">₹{{ product.original_price }}</span>
+                                <span class="veirdo-discount">SALE</span>
+                                {% endif %}
+                            </div>
+                            <div class="veirdo-best-price"><i class="fas fa-check-circle" style="font-size: 11px;"></i>
+                                Best price ₹{% widthratio product.price 10 9 %}</div>
+                        </div>
+                    </a>
+                    <div style="padding: 0; padding-top: 6px; border-top: 1px solid #eaeaea; margin-top: auto;">
+                        {% if product.external_buy_url %}
+                        <a href="{{ product.external_buy_url }}" target="_blank" rel="noopener noreferrer"
+                            class="veirdo-add-to-cart" style="display: block; text-align: center; text-decoration: none;">
+                            BUY NOW{% if product.external_platform_name %} on {{ product.external_platform_name }}{% endif %}
+                        </a>
+                        {% endif %}
+                        {# Add to Cart hidden temporarily — uncomment when cart is ready #}
+                    </div>
+                </article>
+                {% empty %}
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                    <i class="fas fa-search" style="font-size: 48px; color: #ddd; margin-bottom: 20px;"></i>
+                    <h3 style="font-weight: 700; color: #333; margin-bottom: 10px;">
+                        {% if request.GET.q %}No products found for "{{ request.GET.q }}"{% else %}No products available{% endif %}
+                    </h3>
+                    <p style="color: #888; font-size: 14px; margin-bottom: 20px;">
+                        {% if request.GET.q %}Try a different search term or browse our collection.{% else %}Check back soon — new items are on the way!{% endif %}
+                    </p>
+                    {% if request.GET.q %}
+                    <a href="{% url 'store:home' %}" class="btn btn-dark" style="border-radius: 30px; padding: 10px 30px; font-weight: 700; text-transform: uppercase; font-size: 13px;">Browse All Products</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Automatically advance the sliders with a random delay to prevent sync
+    document.querySelectorAll('.hero-slider-inner').forEach((slider) => {
+        const images = slider.querySelectorAll('img');
+        if (images.length > 1) {
+            // Random interval between 2500ms and 5500ms for each individual card
+            const randomInterval = Math.floor(Math.random() * 3000) + 2500;
+
+            setInterval(() => {
+                const maxScroll = slider.scrollWidth - slider.clientWidth;
+                if (slider.scrollLeft >= maxScroll - 5) {
+                    slider.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    slider.scrollBy({ left: slider.clientWidth, behavior: 'smooth' });
+                }
+            }, randomInterval);
+        }
+
+        // Logic to update dots when sliding occurs
+        slider.addEventListener('scroll', () => {
+            const index = Math.round(slider.scrollLeft / slider.offsetWidth);
+            const parent = slider.closest('.veirdo-product-image-container');
+            const dots = parent.querySelectorAll('.dot');
+            if (dots.length > 0) {
+                dots.forEach((d) => d.classList.remove('active'));
+                if (dots[index]) dots[index].classList.add('active');
+            }
+        });
+    });
+
+    function toggleFilter(header) {
+        const body = header.nextElementSibling;
+        const icon = header.querySelector('i');
+        if (body.style.display === 'none') {
+            body.style.display = 'flex';
+            icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+        } else {
+            body.style.display = 'none';
+            icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+        }
+    }
+</script>
+{% endblock %}

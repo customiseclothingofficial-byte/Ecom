@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Return Status - Order #{{ order.id }} - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+    .status-page-container {
+        padding: 60px 0;
+        min-height: 80vh;
+    }
+
+    .status-card-modern {
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        border-radius: 40px;
+        padding: 40px;
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    .s-header-modern {
+        text-align: center;
+        margin-bottom: 48px;
+    }
+
+    /* Status Summary */
+    .status-summary-box {
+        background: white;
+        border-radius: 24px;
+        padding: 32px;
+        border: 1px solid var(--border);
+        margin-bottom: 40px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+    }
+
+    .s-item label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 1.5px;
+        margin-bottom: 8px;
+    }
+
+    .s-item span {
+        font-weight: 800;
+        font-size: 18px;
+        color: var(--text-main);
+    }
+
+    .badge-modern {
+        padding: 6px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-approved {
+        background: var(--bg-green);
+        color: var(--primary-green);
+    }
+
+    .badge-rejected {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .badge-completed {
+        background: #000;
+        color: white;
+    }
+
+    /* Refund Info */
+    .refund-callout {
+        background: var(--bg-green);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    /* Timeline */
+    .timeline-modern {
+        padding-left: 40px;
+        position: relative;
+    }
+
+    .timeline-modern::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--border);
+    }
+
+    .t-step {
+        position: relative;
+        padding-bottom: 40px;
+    }
+
+    .t-step:last-child {
+        padding-bottom: 0;
+    }
+
+    .t-marker {
+        position: absolute;
+        left: -31px;
+        width: 24px;
+        height: 24px;
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: 50%;
+        z-index: 2;
+    }
+
+    .t-step.done .t-marker {
+        background: var(--primary-green);
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 5px var(--bg-green);
+    }
+
+    .t-step.active .t-marker {
+        background: var(--text-main);
+        border-color: var(--text-main);
+    }
+
+    .t-content {
+        opacity: 0.5;
+    }
+
+    .t-step.done .t-content,
+    .t-step.active .t-content {
+        opacity: 1;
+    }
+
+    .t-title {
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 4px;
+    }
+
+    .t-desc {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    @media (max-width: 576px) {
+        .status-summary-box {
+            grid-template-columns: 1fr;
+        }
+
+        .status-card-modern {
+            padding: 24px;
+        }
+    }
+</style>
+
+<div class="status-page-container">
+    <div class="container-modern">
+        <div class="status-card-modern">
+
+            <div class="s-header-modern">
+                <div class="section-tag" style="background: var(--bg-green); color: var(--primary-green);">Security
+                    Check</div>
+                <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -1.5px;">Return Progress</h1>
+                <p class="text-muted">Tracking your return and refund verification.</p>
+            </div>
+
+            <div class="status-summary-box">
+                <div class="s-item">
+                    <label>Current Status</label>
+                    <span class="badge-modern badge-{{ return_request.status }}">
+                        {% if return_request.status == 'pending' %}Under Review
+                        {% elif return_request.status == 'approved' %}Authorized
+                        {% elif return_request.status == 'rejected' %}Declined
+                        {% elif return_request.status == 'completed' %}Refunded{% endif %}
+                    </span>
+                </div>
+                <div class="s-item">
+                    <label>Order Reference</label>
+                    <span>#{{ order.id }}</span>
+                </div>
+                <div class="s-item">
+                    <label>Requested On</label>
+                    <span>{{ return_request.requested_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="s-item">
+                    <label>Refund Destination</label>
+                    <span>Studio Wallet</span>
+                </div>
+            </div>
+
+            {% if return_request.status == 'completed' %}
+            <div class="refund-callout">
+                <i class="fas fa-check-circle" style="font-size: 32px; color: var(--primary-green);"></i>
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 700; margin: 0;">Refund Successful</h4>
+                    <p style="font-size: 14px; margin: 0; opacity: 0.7;">₹{{ return_request.refund_amount }} has been
+                        credited back to your wallet.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="timeline-modern">
+                <div class="t-step done">
+                    <div class="t-marker"></div>
+                    <div class="t-content">
+                        <div class="t-title">Request Submitted</div>
+                        <div class="t-desc">We received your return request and it's being analyzed.</div>
+                    </div>
+                </div>
+
+                <div class="t-step {% if return_request.status != 'pending' %}done{% else %}active{% endif %}">
+                    <div class="t-marker"></div>
+                    <div class="t-content">
+                        <div class="t-title">Validation</div>
+                        <div class="t-desc">Our experts are verifying the reason and order eligibility.</div>
+                    </div>
+                </div>
+
+                {% if return_request.status == 'rejected' %}
+                <div class="t-step active">
+                    <div class="t-marker" style="background: #ef4444; border-color: #ef4444;"></div>
+                    <div class="t-content" style="opacity: 1;">
+                        <div class="t-title">Request Declined</div>
+                        <div class="t-desc" style="color: #ef4444;">{{
+                            return_request.admin_notes|default:"Unfortunately, your request did not meet our return
+                            criteria." }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <div
+                    class="t-step {% if return_request.status == 'completed' or return_request.status == 'approved' %}done{% endif %}">
+                    <div class="t-marker"></div>
+                    <div class="t-content">
+                        <div class="t-title">Authorization</div>
+                        <div class="t-desc">The refund has been approved and moved to transit.</div>
+                    </div>
+                </div>
+
+                <div class="t-step {% if return_request.status == 'completed' %}done{% endif %}">
+                    <div class="t-marker"></div>
+                    <div class="t-content">
+                        <div class="t-title">Fund Transfer</div>
+                        <div class="t-desc">Amount is released back to your original studio wallet.</div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div style="margin-top: 60px; text-align: center; display: flex; gap: 16px; justify-content: center;">
+                <a href="{% url 'accounts:my_orders' %}" class="btn btn-dark rounded-pill px-5">Back to Orders</a>
+                {% if return_request.status == 'completed' %}
+                <a href="{% url 'store:wallet' %}" class="btn btn-outline-dark rounded-pill px-5">View Wallet</a>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

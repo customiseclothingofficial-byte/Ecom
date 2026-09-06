@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject }}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f6f6f6;
+            color: #111111;
+            -webkit-font-smoothing: antialiased;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #f6f6f6;
+            padding-bottom: 40px;
+        }
+        .main {
+            background-color: #ffffff;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 600px;
+            border-spacing: 0;
+            font-family: sans-serif;
+            color: #111111;
+        }
+        .header {
+            padding: 30px 0;
+            text-align: center;
+            background-color: #000000;
+            border-bottom: 4px solid #12b76a;
+        }
+        .logo {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #ffffff;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .logo-green {
+            color: #12b76a;
+        }
+        .content {
+            padding: 40px 30px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .footer {
+            padding: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+            background-color: #ffffff;
+            border-top: 1px solid #eeeeee;
+        }
+        .button {
+            display: inline-block;
+            padding: 16px 32px;
+            background-color: #000000;
+            color: #ffffff !important;
+            text-decoration: none;
+            font-weight: 800;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            margin: 20px 0;
+        }
+        .success-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #12b76a;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .summary-table {
+            width: 100%;
+            margin: 30px 0;
+            border-top: 1px solid #eeeeee;
+        }
+        .summary-row {
+            border-bottom: 1px solid #eeeeee;
+        }
+        .summary-row td {
+            padding: 15px 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background-color: #12b76a;
+            color: #ffffff;
+        }
+        @media screen and (max-width: 600px) {
+            .content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <table class="main">
+            <tr>
+                <td class="header">
+                    <a href="#" class="logo">Customise <span class="logo-green">Clothing</span></a>
+                </td>
+            </tr>
+            <tr>
+                <td class="content">
+                    {% block email_content %}{% endblock %}
+                </td>
+            </tr>
+            <tr>
+                <td class="footer">
+                    <p>&copy; {{ "now"|date:"Y" }} Customise Clothing Official. All rights reserved.</p>
+                    <p>Support: {{ site_contact_email|default:"customiseclothingofficial@gmail.com" }} | {{ site_contact_phone|default:"+91 9114960778" }}</p>
+                    <p style="margin-top: 20px;">You received this email because you're a registered customer of Customise Clothing.</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

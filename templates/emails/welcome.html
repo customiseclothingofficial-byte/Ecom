@@ -1,0 +1,27 @@
+{% extends 'emails/base_email.html' %}
+
+{% block email_content %}
+<div style="text-align: center; margin-bottom: 30px;">
+    <div style="font-size: 50px; margin-bottom: 20px;">🔥</div>
+    <h1 style="margin: 0; font-size: 28px; font-weight: 800; text-transform: uppercase;">Welcome to the Clan</h1>
+</div>
+
+<p>Hi {{ user.username }},</p>
+
+<p>Welcome to <strong>Customise Clothing</strong>. We're hyped to have you with us!</p>
+
+<p>You now have access to premium quality fits and our unique design tools to bring your own vibe to life. Start exploring our latest collections or jump straight into the lab and design your own pieces.</p>
+
+<div style="text-align: center; margin: 40px 0;">
+    <a href="{{ request.scheme }}://{{ request.get_host }}" class="button">Start Shopping</a>
+</div>
+
+<p>Here's what you can do next:</p>
+<ul style="padding-left: 20px; color: #444;">
+    <li style="margin-bottom: 10px;"><strong>Customise:</strong> Use our AI-powered tool to upload logos or generate designs.</li>
+    <li style="margin-bottom: 10px;"><strong>Exclusive Drops:</strong> Get first access to our seasonal streetwear collections.</li>
+    <li style="margin-bottom: 10px;"><strong>Track Orders:</strong> Keep an eye on your gear from production to your doorstep.</li>
+</ul>
+
+<p style="margin-top: 40px;">Stay fresh,<br><strong>Team Customise Clothing</strong></p>
+{% endblock %}

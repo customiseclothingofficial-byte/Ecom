@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Return Order #{{ order.id }} - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  .return-page-container {
+    padding: 60px 0;
+    min-height: 80vh;
+  }
+
+  .return-card-modern {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .r-header-modern {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .section-tag {
+    background: #fee2e2;
+    color: #ef4444;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 15px;
+  }
+
+  .refund-banner {
+    background: var(--bg-green);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .refund-banner i {
+    font-size: 32px;
+    color: var(--primary-green);
+  }
+
+  /* Form Elements */
+  .f-group-modern {
+    margin-bottom: 24px;
+  }
+
+  .f-label-modern {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-main);
+  }
+
+  .f-input-modern {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 20px;
+    font-size: 15px;
+    transition: all 0.3s;
+    outline: none;
+  }
+
+  .f-input-modern:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+  }
+
+  .btn-return-modern {
+    width: 100%;
+    background: #ef4444;
+    color: white !important;
+    padding: 18px;
+    border-radius: 20px;
+    border: none;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-return-modern:hover {
+    background: #dc2626;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
+  }
+
+  .info-summary-modern {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 576px) {
+    .return-card-modern {
+      padding: 24px;
+    }
+
+    .refund-banner {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
+
+<div class="return-page-container">
+  <div class="container-modern">
+    <div class="return-card-modern">
+
+      <div class="r-header-modern">
+        <div class="section-tag">Return Portal</div>
+        <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -1.5px;">Return Request</h1>
+        <p class="text-muted">Initiate a return for Order #{{ order.id }}</p>
+      </div>
+
+      <div class="refund-banner">
+        <i class="fas fa-wallet"></i>
+        <div style="flex: 1;">
+          <h4 style="font-size: 16px; font-weight: 700; margin: 0;">Full Refund to Wallet</h4>
+          <p style="font-size: 14px; margin: 0; opacity: 0.7;">The total amount of ₹{{ order.total_amount }} will be
+            credited back once approved.</p>
+        </div>
+      </div>
+
+      <div class="info-summary-modern">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+          <span class="text-muted">Order Date:</span>
+          <span class="fw-bold">{{ order.created_at|date:"M d, Y" }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 14px;">
+          <span class="text-muted">Items Included:</span>
+          <span class="fw-bold">{{ order.items.count }} Pieces</span>
+        </div>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="f-group-modern">
+          <label class="f-label-modern">Why are you returning this?</label>
+          <textarea name="reason" class="f-input-modern" rows="4"
+            placeholder="e.g. Size was too large, design didn't match expectations..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-return-modern">Submit Return Request</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 32px;">
+        <a href="{% url 'accounts:my_orders' %}" class="text-decoration-none text-muted small">Cancel and go back</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

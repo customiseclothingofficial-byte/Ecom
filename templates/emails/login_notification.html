@@ -1,0 +1,25 @@
+{% extends 'emails/base_email.html' %}
+
+{% block email_content %}
+<div style="text-align: center; margin-bottom: 30px;">
+    <div style="font-size: 50px; margin-bottom: 20px;">🛡️</div>
+    <h1 style="margin: 0; font-size: 24px; font-weight: 800; text-transform: uppercase;">New Login Detected</h1>
+</div>
+
+<p>Hi {{ user.username }},</p>
+
+<p>A new login was detected for your Customise Clothing account. If this was you, you can safely ignore this email.</p>
+
+<div style="background-color: #fafafa; padding: 25px; border-radius: 8px; margin: 30px 0;">
+    <p style="margin: 5px 0;"><strong>Status:</strong> New Session Started Successfully</p>
+    <p style="margin: 5px 0;"><strong>Time:</strong> {{ "now"|date:"F d, Y \a\t g:i A" }}</p>
+</div>
+
+<p style="color: #666; font-size: 14px; background-color: #fff3f3; padding: 15px; border-radius: 4px; border-left: 4px solid #ff4444;">
+    <strong>Wasn't you?</strong> If you don't recognize this activity, please change your password immediately and contact support to secure your account.
+</p>
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:profile' %}" class="button" style="background-color: #ff4444;">Review Profile</a>
+</div>
+{% endblock %}

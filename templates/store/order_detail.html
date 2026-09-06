@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Order Logistics - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  .order-detail-container {
+    padding: 100px 0;
+    min-height: 80vh;
+  }
+
+  .page-header-modern {
+    margin-bottom: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .nav-back-studio {
+    color: var(--text-muted);
+    text-decoration: none !important;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+  }
+
+  .nav-back-studio:hover {
+    color: var(--primary-green);
+    transform: translateX(-4px);
+  }
+
+  .page-title-modern {
+    font-size: 64px;
+    font-weight: 800;
+    letter-spacing: -3px;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .order-master-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border);
+    border-radius: 48px;
+    padding: 60px;
+    margin-bottom: 40px;
+  }
+
+  .order-status-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 60px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .status-pill-large {
+    padding: 12px 32px;
+    border-radius: 60px;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .status-indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .status-processing {
+    background: #fffbeb;
+    color: #b45309;
+  }
+
+  .status-processing .status-indicator-dot {
+    background: #b45309;
+    box-shadow: 0 0 10px #b45309;
+  }
+
+  .status-shipped {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  .status-shipped .status-indicator-dot {
+    background: #1d4ed8;
+    box-shadow: 0 0 10px #1d4ed8;
+  }
+
+  .status-delivered {
+    background: var(--bg-green);
+    color: var(--primary-green);
+  }
+
+  .status-delivered .status-indicator-dot {
+    background: var(--primary-green);
+    box-shadow: 0 0 10px var(--primary-green);
+  }
+
+  .status-cancelled {
+    background: #fef2f2;
+    color: #dc2626;
+  }
+
+  .status-cancelled .status-indicator-dot {
+    background: #dc2626;
+    box-shadow: 0 0 10px #dc2626;
+  }
+
+  .order-id-display {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text-main);
+  }
+
+  .order-id-display span {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .meta-grid-studio {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-bottom: 60px;
+  }
+
+  .meta-block-studio h5 {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+  }
+
+  .meta-block-studio p {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Items Table */
+  .items-section-studio {
+    background: white;
+    border-radius: 32px;
+    padding: 40px;
+    border: 1px solid var(--border);
+  }
+
+  .studio-item-row {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: 32px;
+    align-items: center;
+    padding: 24px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .studio-item-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .studio-item-row:first-child {
+    padding-top: 0;
+  }
+
+  .item-thumb-studio {
+    width: 100px;
+    height: 100px;
+    background: #f1f5f9;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .item-thumb-studio img {
+    width: 75%;
+    height: 75%;
+    object-fit: contain;
+  }
+
+  .item-name-studio {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .item-meta-studio {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .item-price-studio {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+
+  .btn-return-banner {
+    background: #000;
+    color: white !important;
+    border-radius: 40px;
+    padding: 40px;
+    text-align: center;
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.3s;
+  }
+
+  .btn-return-banner:hover {
+    transform: translateY(-8px);
+  }
+
+  @media (max-width: 991px) {
+    .meta-grid-studio {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .page-title-modern {
+      font-size: 48px;
+    }
+
+    .order-master-card {
+      padding: 40px;
+    }
+  }
+</style>
+
+<div class="order-detail-container">
+  <div class="container-modern">
+
+    <div class="page-header-modern">
+      <div>
+        <a href="{% url 'accounts:my_orders' %}" class="nav-back-studio">
+          <i class="fas fa-chevron-left"></i> Vault History
+        </a>
+        <h1 class="page-title-modern">Order Logistics</h1>
+      </div>
+      <div class="section-tag d-none d-md-inline-block">Status: {{ order.get_status_display }}</div>
+    </div>
+
+    <!-- Main Detail Card -->
+    <div class="order-master-card">
+      <div class="order-status-banner">
+        <div class="order-id-display">
+          <span>Ref:</span> #{{ order.id }}
+        </div>
+
+        <!-- Order Items -->
+        <div class="detail-card p-4">
+          <h5><i class="fas fa-shopping-bag me-2"></i>Order Items</h5>
+
+          <div class="order-items">
+            {% for item in order.items.all %}
+            <div class="order-item">
+              <div class="item-image">
+                {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product_name }}"
+                  style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                {% else %}
+                <i class="fas fa-image text-muted"></i>
+                {% endif %}
+              </div>
+              <div class="item-details">
+                <div class="item-name">{{ item.product_name }}</div>
+                <div class="item-quantity">
+                  Quantity: {{ item.quantity }} × ₹{{ item.unit_price }}
+                  {% if item.size %} | Size: {{ item.size.code }}{% endif %}
+                  {% if item.color %}
+                  | Color: {{ item.color.name }}
+                  <span
+                    style="width: 10px; height: 10px; background: {{ item.color.hex_code }}; border-radius: 50%; display: inline-block; margin-left: 2px; border: 1px solid #ddd;"></span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="item-price">₹{{ item.line_total }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="meta-grid-studio">
+        <div class="meta-block-studio">
+          <h5>Acquisition Date</h5>
+          <p>{{ order.created_at|date:"d F Y" }}</p>
+        </div>
+        <div class="meta-block-studio">
+          <h5>Payment Protocol</h5>
+          <p>{{ order.get_payment_method_display }}</p>
+        </div>
+        <div class="meta-block-studio">
+          <h5>Total Investment</h5>
+          <p style="color: var(--primary-green); font-size: 24px;">₹{{ order.total_amount }}</p>
+        </div>
+      </div>
+
+      <div class="row g-5">
+        <div class="col-md-6">
+          <div class="meta-block-studio">
+            <h5>Recipient Identity</h5>
+            <p>{{ order.full_name }}</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="meta-block-studio">
+            <h5>Destination Logistics</h5>
+            <p>{{ order.address_line1 }}</p>
+            <p style="font-weight: 500; opacity: 0.6; font-size: 15px;">{{ order.city }}, {{ order.state }} - {{
+              order.postal_code }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items Section -->
+      <div class="items-section-studio mt-5">
+        <h5
+          style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1.5px; margin-bottom: 32px;">
+          Included Pieces
+        </h5>
+
+        {% for item in order.items.all %}
+        <div class="studio-item-row">
+          <div class="item-thumb-studio">
+            {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" alt="Item">
+            {% else %}
+            <i class="fas fa-image" style="font-size: 32px; color: #cbd5e0;"></i>
+            {% endif %}
+          </div>
+          <div>
+            <div class="item-name-studio">{{ item.product_name }}</div>
+            <div class="item-meta-studio">Quantity: {{ item.quantity }} | Unit Value: ₹{{
+              item.product.price|default:item.line_total }}</div>
+          </div>
+          <div class="item-price-studio">₹{{ item.line_total }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Return Actions -->
+    {% if order.can_be_returned %}
+    <div class="btn-return-banner">
+      <h3 class="fw-800 m-0" style="letter-spacing: -1px;">Resolution Portal</h3>
+      <p class="opacity-60 m-0">Need to return this selection? Our 30-day window is active.</p>
+      <a href="{% url 'store:request_return' order.id %}" class="btn-buy-modern px-5 mt-2">Initiate Return</a>
+    </div>
+    {% endif %}
+
+    <div class="text-center mt-5">
+      <a href="{% url 'store:home' %}" class="btn btn-outline-dark rounded-pill px-5 py-3 fw-800">Return to Studio
+        Home</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

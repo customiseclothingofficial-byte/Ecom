@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Customise Clothing - Your Online Store{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* VEIRDO Style Colors */
+            --primary-bg: #FFFFFF;
+            --bottom-nav-height: 65px;
+            --veirdo-black: #000000;
+            --veirdo-green: #12B76A;
+            --veirdo-emerald: #00A360;
+            --veirdo-blue: #004CFF;
+            --veirdo-purple: #9333EA;
+            --veirdo-grey: #F3F4F6;
+        }
+
+        * {
+            font-family: 'IBM Plex Sans', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            padding-bottom: var(--bottom-nav-height);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            color: var(--veirdo-black);
+        }
+
+        /* Promo Bar */
+        .veirdo-promo-bar {
+            background-color: #3B82F6;
+            color: #fff;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            gap: 20px;
+        }
+
+        /* Main Header */
+        .main-header {
+            background: #fff;
+            border-bottom: 1px solid #eaeaea;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+        }
+
+        /* Ensure Offcanvas Mobile Menu is in front of main header (z-index 1050) */
+        .offcanvas.offcanvas-start {
+            z-index: 1095 !important;
+        }
+
+        .offcanvas-backdrop {
+            z-index: 1090 !important;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-left-section {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .header-logo {
+            text-decoration: none;
+            line-height: 1;
+            display: inline-block;
+        }
+
+        .desktop-nav a {
+            color: #4b5563;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+
+        .desktop-nav a:hover {
+            color: #000;
+        }
+
+        .header-right-section {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .header-search {
+            position: relative;
+            width: 250px;
+        }
+
+        .header-search input {
+            width: 100%;
+            border: 1px solid #C084FC;
+            border-radius: 6px;
+            padding: 8px 35px 8px 15px;
+            font-size: 13px;
+            color: #000;
+            outline: none;
+            background: #FAFAFA;
+        }
+
+        .header-search input::placeholder {
+            color: #9CA3AF;
+        }
+
+        .header-search button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #8B5CF6;
+            cursor: pointer;
+        }
+
+        @media (max-width: 991px) {
+            .header-left-section {
+                gap: 15px;
+            }
+
+            .header-search {
+                width: 140px;
+            }
+
+            .header-search input {
+                padding: 6px 30px 6px 12px;
+                font-size: 12px;
+            }
+
+            .header-icons {
+                gap: 15px;
+            }
+
+            .header-icons i {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-search {
+                display: none;
+                /* Hide search on very small phones to avoid overlap, or use a toggle */
+            }
+
+            .header-inner {
+                padding: 10px 15px;
+            }
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .header-icons i {
+            font-size: 20px;
+            color: #000;
+            transition: color 0.2s;
+        }
+
+        .header-icons i:hover {
+            color: var(--veirdo-blue);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--bottom-nav-height);
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 1040;
+            border-top: 1px solid #eaeaea;
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 11px;
+            font-weight: 600;
+            gap: 4px;
+            width: 20%;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .bottom-nav-item i {
+            font-size: 20px;
+        }
+
+        .bottom-nav-item.active,
+        .bottom-nav-item:hover {
+            color: var(--veirdo-black);
+        }
+
+        /* Offcanvas Menu */
+        .offcanvas.offcanvas-start {
+            width: 85%;
+            max-width: 350px;
+        }
+
+        .offcanvas-header {
+            border-bottom: 1px solid #eaeaea;
+            padding: 20px;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        @media (min-width: 992px) {
+            .header-inner {
+                padding: 15px 40px;
+            }
+
+            .bottom-nav {
+                display: none !important;
+            }
+
+            body {
+                padding-bottom: 0;
+            }
+
+            .veirdo-footer {
+                padding-bottom: 60px !important;
+            }
+        }
+
+        /* Compact Veirdo Footer */
+        .veirdo-footer {
+            background: var(--veirdo-emerald);
+            /* Restored original color */
+            color: #fff;
+            padding: 30px 20px 80px;
+            /* Kept compact padding */
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-weight: 900;
+            font-size: 20px;
+            /* Smaller logo */
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .footer-tagline {
+            font-size: 11px;
+            /* Smaller tagline */
+            font-weight: 500;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px 20px;
+            margin-bottom: 25px;
+        }
+
+        .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            /* Smaller links */
+            font-weight: 500;
+            text-transform: capitalize;
+            /* Cleaner look */
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-socials {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .footer-socials a {
+            color: #000;
+            background: #fff;
+            width: 35px;
+            /* Smaller social circles */
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: transform 0.3s, background 0.3s, color 0.3s;
+        }
+
+        .footer-socials a:hover {
+            transform: translateY(-3px);
+            background: var(--veirdo-black);
+            color: #fff;
+        }
+
+        .footer-contact {
+            font-size: 12px;
+            /* Smaller contact info */
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .footer-copyright {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 15px;
+        }
+
+        .footer-copyright {
+            font-size: 12px;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .badge.bg-danger {
+            background-color: var(--veirdo-purple) !important;
+            color: white;
+            border: 2px solid white;
+        }
+
+        /* Category Circles Bar Slider */
+        .category-circles-wrapper {
+            position: relative;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 10px 0;
+        }
+
+        .category-circles-nav {
+            padding: 5px 10px;
+            white-space: nowrap;
+            overflow-x: auto;
+            display: flex;
+            justify-content: flex-start;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+        }
+
+        .category-circles-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-circle-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #000;
+            flex: 0 0 calc(100% / 6.5);
+            /* Show ~6.5 items to hint at more */
+            scroll-snap-align: start;
+            transition: transform 0.2s;
+        }
+
+        .cat-circle-item:hover {
+            transform: scale(1.05);
+            color: var(--veirdo-green);
+        }
+
+        .cat-img-wrapper {
+            width: 55px;
+            /* More compact */
+            height: 55px;
+            border-radius: 50%;
+            padding: 2px;
+            border: 2px solid #eaeaea;
+            margin-bottom: 5px;
+            background: #fff;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cat-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .cat-label {
+            font-size: 9px;
+            /* More compact */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            text-align: center;
+            white-space: normal;
+            width: 100%;
+            line-height: 1.1;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-arrow-left {
+            left: 5px;
+        }
+
+        .nav-arrow-right {
+            right: 5px;
+        }
+
+        @media (max-width: 991px) {
+            .cat-circle-item {
+                flex: 0 0 75px;
+                /* Fixed width on mobile */
+            }
+
+            .nav-arrow {
+                display: none;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .cat-circle-item {
+                flex: 0 0 calc(100% / 8.5);
+                /* Show more on very wide screens if needed, or stick to 6 */
+            }
+        }
+
+        /* Locking to 6 for desktop as requested */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .cat-circle-item {
+                flex: 0 0 calc(100% / 6.5);
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+    {# Global CSRF token — ensures Django sets the csrftoken cookie on every page #}
+    {% csrf_token %}
+    <!-- Premium Branded Pre-loader -->
+    <div id="site-loader"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s ease, visibility 0.8s; visibility: visible; opacity: 1;">
+        <div style="text-align: center; overflow: hidden;">
+            <div style="margin-bottom: 5px;">
+                <h1
+                    style="color: #10b981; font-family: 'Outfit', sans-serif; font-weight: 900; letter-spacing: 2px; margin: 0; font-size: 38px; line-height: 1; transform: translateY(100%); animation: slideUpReveal 0.8s forwards cubic-bezier(0.2, 1, 0.3, 1);">
+                    CUSTOMISE</h1>
+            </div>
+            <div>
+                <h1
+                    style="color: #000; font-family: 'Outfit', sans-serif; font-weight: 900; letter-spacing: 2px; margin: 0; font-size: 38px; line-height: 1; transform: translateY(100%); animation: slideUpReveal 0.8s 0.2s forwards cubic-bezier(0.2, 1, 0.3, 1);">
+                    CLOTHING</h1>
+            </div>
+            <div
+                style="width: 0; height: 3px; background: #10b981; margin: 15px auto 0; border-radius: 10px; animation: expandLine 1s 0.5s forwards ease-out;">
+            </div>
+        </div>
+    </div>
+    <style>
+        @keyframes slideUpReveal {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes expandLine {
+            from {
+                width: 0;
+            }
+
+            to {
+                width: 140px;
+            }
+        }
+
+        .site-loader-hidden {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+    </style>
+    <script>
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                const loader = document.getElementById('site-loader');
+                if (loader) loader.classList.add('site-loader-hidden');
+            }, 300);
+        });
+        // Fallback hide after 1.5s in case load event takes long
+        setTimeout(function () {
+            const loader = document.getElementById('site-loader');
+            if (loader) loader.classList.add('site-loader-hidden');
+        }, 1500);
+    </script>
+
+    <!-- Offcanvas Sidebar Menu -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title fw-bold" id="mobileMenuLabel">MENU</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item border-0 px-0 py-3"><a href="{% url 'store:home' %}"
+                        class="text-dark text-decoration-none fw-bold fs-5">Home</a></li>
+                <li class="list-group-item border-0 px-0 py-3"><a href="{% url 'store:all_products' %}"
+                        class="text-dark text-decoration-none fw-bold fs-5">Shop All / Bestsellers</a></li>
+                <li class="list-group-item border-0 px-0 py-3"><a href="{% url 'accounts:my_orders' %}"
+                        class="text-dark text-decoration-none fw-bold fs-5">Track Order</a></li>
+                <li class="list-group-item border-0 px-0 py-2"><a href="{% url 'store:refund_cancellation_policy' %}"
+                        class="text-muted text-decoration-none fw-bold fs-6">Refund Policy</a></li>
+                <li class="list-group-item border-0 px-0 py-2"><a href="{% url 'store:shipping_policy' %}"
+                        class="text-muted text-decoration-none fw-bold fs-6">Shipping Policy</a></li>
+                <li class="list-group-item border-0 px-0 py-2"><a href="{% url 'store:terms_conditions' %}"
+                        class="text-muted text-decoration-none fw-bold fs-6">Terms & Conditions</a></li>
+                {% if user.is_authenticated %}
+                <li class="list-group-item border-0 px-0 py-3"><a href="{% url 'accounts:my_orders' %}"
+                        class="text-dark text-decoration-none fw-bold fs-5">My Orders</a></li>
+                <li class="list-group-item border-0 px-0 py-3"><a href="{% url 'accounts:profile' %}"
+                        class="text-dark text-decoration-none fw-bold fs-5">Profile</a></li>
+                <li class="list-group-item border-0 px-0 py-3">
+                    <form action="{% url 'logout' %}" method="post" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="border-0 bg-transparent p-0 text-dark fw-bold fs-5">Logout</button>
+                    </form>
+                </li>
+                {% elif auth_enabled %}
+                <li class="list-group-item border-0 px-0 py-3"><a href="{% url 'login' %}"
+                        class="text-dark text-decoration-none fw-bold fs-5">Login / Sign up</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Promo Bar -->
+    <div class="veirdo-promo-bar">
+        <i class="fas fa-chevron-left" style="cursor: pointer;"></i>
+        <span>This Is Customise Clothing's Official Website. Order Only Here!</span>
+        <i class="fas fa-chevron-right" style="cursor: pointer;"></i>
+    </div>
+
+    <!-- Desktop & Mobile Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="header-left-section">
+                <!-- Mobile Menu Icon -->
+                <i class="fas fa-bars cursor-pointer d-lg-none" style="font-size: 22px; margin-right: 15px;"
+                    data-bs-toggle="offcanvas" data-bs-target="#mobileMenu"></i>
+
+                <!-- Logo -->
+                <a href="{% url 'store:home' %}" class="header-logo" style="text-decoration: none;">
+                    <span style="font-size: 26px; font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase;">
+                        <span style="color: #12B76A;">CUSTOMISE</span>
+                        <span style="color: #000; margin-left: 2px;">CLOTHING</span>
+                    </span>
+                </a>
+
+                <!-- Removed Desktop Nav Links as per user request -->
+            </div>
+
+            <!-- Header Right: Search & Icons -->
+            <div class="header-right-section">
+                <!-- Desktop Search -->
+                <form action="{% url 'store:home' %}" method="get" class="header-search d-none d-lg-flex">
+                    <input type="text" name="q" value="{{ request.GET.q|default:'' }}"
+                        placeholder="Try searching &quot;T-shirts&quot;">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+
+                <div class="header-icons">
+                    <i class="fas fa-search cursor-pointer d-lg-none"></i>
+                    {# Account icon temporarily hidden while login/signup are disabled #}
+                    {% if auth_enabled %}
+                    <a href="{% url 'accounts:profile' %}" class="text-dark d-none d-lg-block"><i
+                            class="far fa-user cursor-pointer"></i></a>
+                    {% endif %}
+                    {# Cart hidden temporarily — uncomment when cart is ready #}
+                    <!--
+                    <a href="{% url 'store:cart' %}" class="text-dark position-relative">
+                        <i class="fas fa-shopping-bag cursor-pointer"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            id="cartBadge" style="font-size: 0.6rem; display: none;">0</span>
+                    </a>
+                    -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Category Circles Navigation (Dynamic Slider) -->
+    <div class="category-circles-wrapper">
+        <div class="nav-arrow nav-arrow-left"
+            onclick="document.getElementById('catNav').scrollBy({left: -200, behavior: 'smooth'})">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="category-circles-nav" id="catNav">
+            {% for cat in all_categories %}
+            {% if cat.id %}
+            <a href="{% url 'store:category_page' cat.id %}" class="cat-circle-item">
+                <div class="cat-img-wrapper">
+                    {% if cat.image %}
+                    <img src="{{ cat.image.url }}" alt="{{ cat.name }}">
+                    {% else %}
+                    <img src="{{ site_category_fallback_image }}"
+                        alt="{{ cat.name }}">
+                    {% endif %}
+                </div>
+                <div class="cat-label">{{ cat.name }}</div>
+            </a>
+            {% endif %}
+            {% endfor %}
+
+            <a href="{% url 'store:all_products' %}" class="cat-circle-item">
+                <div class="cat-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=150&h=150&fit=crop"
+                        alt="All">
+                </div>
+                <div class="cat-label">Shop All</div>
+            </a>
+        </div>
+        <div class="nav-arrow nav-arrow-right"
+            onclick="document.getElementById('catNav').scrollBy({left: 200, behavior: 'smooth'})">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </div>
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-pill px-4">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <!-- Footer - VEIRDO Style -->
+    <footer class="veirdo-footer">
+        <div class="container-fluid">
+            <h3 class="footer-logo" style="font-size: 24px;">CUSTOMISE CLOTHING</h3>
+            <p class="footer-tagline">FIND YOUR FLIP SIDE</p>
+
+            <div class="footer-links">
+                <a href="{% url 'store:home' %}">Home</a>
+                <a href="{% url 'store:all_products' %}">Shop All</a>
+                <a href="{% url 'accounts:my_orders' %}">Track Order</a>
+                <a href="{% url 'store:refund_cancellation_policy' %}">Refund Policy</a>
+                <a href="{% url 'store:shipping_policy' %}">Shipping Policy</a>
+                <a href="{% url 'store:terms_conditions' %}">Terms</a>
+            </div>
+
+            <div class="footer-socials">
+                <a href="https://www.instagram.com/"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/"><i class="fab fa-whatsapp"></i></a>
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+            </div>
+
+            <div class="footer-contact">
+                <p><i class="fas fa-envelope"></i> {{ site_support_email|default:'help@customiseclothing.in' }}</p>
+                <p><i class="fas fa-phone"></i> {{ site_contact_phone|default:'+91 9114960778' }}</p>
+            </div>
+
+            <p class="footer-copyright">&copy; 2026 Customise Clothing. All rights reserved.</p>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to update cart badge
+            function updateCartBadge(count) {
+                const badge = document.getElementById('cartBadge');
+                if (badge) {
+                    badge.textContent = count || 0;
+                    badge.style.display = (count && count > 0) ? 'inline-block' : 'none';
+                }
+            }
+
+            // Function to get CSRF token
+            function getCSRFToken() {
+                return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                    getCookie('csrftoken');
+            }
+
+            // Function to get cookie by name
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Function to show toast notifications
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `position-fixed bottom-0 end-0 m-3 p-3 bg-${type} text-white rounded shadow`;
+                toast.style.zIndex = '1100';
+                toast.style.transition = 'opacity 0.5s ease';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(() => toast.style.opacity = '1', 10);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 500);
+                }, 3000);
+            }
+
+            // Function to mark button as in cart
+            function markButtonAsAdded(button) {
+                const originalHTML = button.innerHTML;
+                const originalClass = button.className;
+                button.classList.add('in-cart');
+                button.innerHTML = '<i class="fas fa-check"></i> Added to Cart';
+                button.className = originalClass.replace('btn-primary', 'btn-success') + ' in-cart';
+                button.disabled = true;
+                button.setAttribute('title', 'This item is in your cart');
+            }
+
+            // Global add to cart function
+            window.addToCart = function (button) {
+                // Check if already in cart
+                if (button.classList.contains('in-cart')) {
+                    showToast('This item is already in your cart', 'info');
+                    return false;
+                }
+
+                // Prevent multiple clicks while processing
+                if (button.classList.contains('processing')) {
+                    console.log('Add to cart already in progress');
+                    return false;
+                }
+
+                button.classList.add('processing');
+
+                const productId = button.dataset.id;
+                const quantity = 1; // Default quantity
+
+                // Check for size selection
+                let selectedSize = button.dataset.selectedSize || null;
+                if (!selectedSize) {
+                    const activeSizeOption = document.querySelector('.size-option.active, .size-chip.active');
+                    if (activeSizeOption) {
+                        selectedSize = activeSizeOption.getAttribute('data-size') || activeSizeOption.textContent.trim();
+                    }
+                }
+
+                // Check for color selection
+                let selectedColor = button.dataset.selectedColor || null;
+                if (!selectedColor) {
+                    const activeColorOption = document.querySelector('.color-option.active, .color-chip.active');
+                    if (activeColorOption) {
+                        selectedColor = activeColorOption.getAttribute('data-color') || activeColorOption.getAttribute('data-color-id');
+                    }
+                }
+
+                // Validation
+                const hasSizes = document.querySelectorAll('.size-option, .size-chip').length > 0;
+                const hasColors = document.querySelectorAll('.color-option, .color-chip').length > 0;
+
+                if (hasSizes && !selectedSize) {
+                    showToast('Please select a size first', 'danger');
+                    button.classList.remove('processing');
+                    return false;
+                }
+
+                if (hasColors && !selectedColor) {
+                    showToast('Please select a color first', 'danger');
+                    button.classList.remove('processing');
+                    return false;
+                }
+
+                // Show loading state
+                const originalHTML = button.innerHTML;
+                const originalClass = button.className;
+                button.disabled = true;
+                button.className = originalClass.replace('btn-primary', 'btn-secondary') + ' processing';
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                // Prepare request data
+                const requestData = {
+                    product_id: productId,
+                    quantity: quantity
+                };
+
+                if (selectedSize) requestData.size = selectedSize;
+                if (selectedColor) requestData.color = selectedColor;
+
+                // Make API call to add to cart
+                console.log('Making global add to cart request for product:', productId, 'Size:', selectedSize, 'Color:', selectedColor);
+                return fetch("{% url 'store:add_to_cart_ajax' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Add to cart response:', data);
+                        if (data.success) {
+                            // Update the cart badge
+                            if (data.cart_total && data.cart_total.total_items !== undefined) {
+                                updateCartBadge(data.cart_total.total_items);
+                            }
+
+                            // Show success message
+                            showToast(data.message || 'Item added to cart!', 'success');
+
+                            // Mark button as added to cart
+                            markButtonAsAdded(button);
+                            button.classList.remove('processing');
+                        } else {
+                            showToast(data.error || 'Error adding to cart', 'danger');
+                            resetButton();
+                        }
+                        return data;
+                    })
+                    .catch(error => {
+                        console.error('Error adding to cart:', error);
+                        showToast('Error adding to cart. Please try again.', 'danger');
+                        resetButton();
+                    });
+
+                // Helper function to reset button state
+                function resetButton() {
+                    // Only reset if not already marked as in cart
+                    if (!button.classList.contains('in-cart')) {
+                        button.innerHTML = originalHTML;
+                        button.className = originalClass;
+                    }
+                    button.disabled = false;
+                    button.classList.remove('processing');
+                }
+            };
+
+            // Single event delegation for all add-to-cart buttons
+            document.addEventListener('click', function (event) {
+                const addToCartBtn = event.target.closest('.add-to-cart-btn');
+                if (addToCartBtn && !event.defaultPrevented) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    window.addToCart(addToCartBtn);
+                }
+            }, true); // Use capture phase to catch events early
+
+            // Initialize cart badge and check for items in cart
+            fetch("{% url 'store:cart_count' %}")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateCartBadge(data.count);
+
+                        // Mark buttons for items already in cart
+                        if (data.items_in_cart && data.items_in_cart.length > 0) {
+                            data.items_in_cart.forEach(productId => {
+                                const buttons = document.querySelectorAll(`.add-to-cart-btn[data-id="${productId}"]`);
+                                buttons.forEach(btn => {
+                                    if (!btn.classList.contains('in-cart')) {
+                                        markButtonAsAdded(btn);
+                                    }
+                                });
+                            });
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading cart count:', error));
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+    <!-- Bottom Sticky Navigation -->
+    <!-- Bottom Sticky Navigation - Actual App Features -->
+    <div class="bottom-nav d-flex d-lg-none">
+        <a href="{% url 'store:home' %}"
+            class="bottom-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="{% url 'store:all_products' %}"
+            class="bottom-nav-item {% if request.resolver_match.url_name == 'all_products' %}active{% endif %}">
+            <i class="fas fa-th-large"></i>
+            <span>Store</span>
+        </a>
+        <a href="{% url 'store:personalize_products' %}"
+            class="bottom-nav-item {% if request.resolver_match.url_name == 'personalize_products' %}active{% endif %}">
+            <div
+                style="background: var(--veirdo-green); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 3px solid white;">
+                <i class="fas fa-magic" style="font-size: 16px;"></i>
+            </div>
+            <span style="margin-top: 2px;">Design</span>
+        </a>
+        {# Cart nav hidden temporarily — uncomment when ready #}
+        <!--
+        <a href="{% url 'store:cart' %}"
+            class="bottom-nav-item {% if request.resolver_match.url_name == 'cart' %}active{% endif %}">
+            <div class="position-relative">
+                <i class="fas fa-shopping-bag"></i>
+                <span id="cartBadgeMobile"
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                    style="font-size: 9px; {% if not cart_total.total_items %}display: none;{% endif %}">
+                    {{ cart_total.total_items }}
+                </span>
+            </div>
+            <span>Cart</span>
+        </a>
+        -->
+        <a href="{% url 'accounts:my_orders' %}"
+            class="bottom-nav-item {% if 'order' in request.path or 'account' in request.path %}active{% endif %}">
+            <i class="fas fa-user"></i>
+            <span>Account</span>
+        </a>
+    </div>
+
+</body>
+
+</html>

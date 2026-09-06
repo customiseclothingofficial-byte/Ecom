@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Wallet - Customise Clothing{% endblock %}
+
+{% block content %}
+<style>
+  .wallet-page-container {
+    padding: 60px 0;
+    min-height: 80vh;
+  }
+
+  /* Premium Balance Card */
+  .balance-card-modern {
+    background: #000;
+    color: white;
+    border-radius: 40px;
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 48px;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.1);
+  }
+
+  .balance-card-modern::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.4) 0%, transparent 70%);
+    filter: blur(40px);
+  }
+
+  .b-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.6;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .b-amount {
+    font-size: 80px;
+    font-weight: 800;
+    letter-spacing: -4px;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .b-amount span {
+    font-size: 40px;
+    opacity: 0.5;
+    margin-right: 4px;
+  }
+
+  /* Transactions */
+  .tx-section-modern {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 32px;
+    padding: 40px;
+  }
+
+  .tx-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+
+  .tx-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .tx-item {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+  }
+
+  .tx-item:hover {
+    transform: translateX(10px);
+    border-color: var(--primary-green);
+  }
+
+  .tx-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .tx-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-main);
+  }
+
+  .tx-date {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .tx-amount {
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .tx-credit {
+    color: var(--primary-green);
+  }
+
+  .tx-debit {
+    color: #ef4444;
+  }
+
+  @media (max-width: 576px) {
+    .b-amount {
+      font-size: 56px;
+    }
+
+    .tx-section-modern {
+      padding: 24px;
+    }
+  }
+</style>
+
+<div class="wallet-page-container">
+  <div class="container-modern">
+    <div style="max-width: 800px; margin: 0 auto;">
+
+      <div class="balance-card-modern">
+        <span class="b-label">Total Balance</span>
+        <div class="b-amount"><span>₹</span>{{ wallet.balance }}</div>
+        <div class="hero-tag">Verified by Secure Node</div>
+      </div>
+
+      <div class="tx-section-modern">
+        <div class="tx-header">
+          <h2 style="font-size: 24px; font-weight: 700; letter-spacing: -1px;">Recent Activity</h2>
+          <div class="section-tag" style="margin: 0;">History</div>
+        </div>
+
+        <div class="tx-list">
+          {% if transactions %}
+          {% for tx in transactions %}
+          <div class="tx-item">
+            <div class="tx-info">
+              <div class="tx-title">{{ tx.description }}</div>
+              <div class="tx-date">{{ tx.created_at|date:"M d, Y • h:i A" }}</div>
+            </div>
+            <div class="tx-amount {% if tx.transaction_type == 'credit' %}tx-credit{% else %}tx-debit{% endif %}">
+              {% if tx.transaction_type == 'credit' %}+{% else %}-{% endif %}₹{{ tx.amount }}
+            </div>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="text-center py-5">
+            <i class="fas fa-receipt fa-3x mb-3" style="opacity: 0.1;"></i>
+            <p class="text-muted">No transactions found in your history.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="mt-5 text-center">
+        <a href="{% url 'store:all_products' %}" class="btn btn-dark rounded-pill px-5">Continue Shopping</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

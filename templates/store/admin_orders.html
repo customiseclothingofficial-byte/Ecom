@@ -1,0 +1,203 @@
+{% extends 'shop_admin_base.html' %}
+
+{% block title %}Manage Orders - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-page { padding: 40px 0; min-height: 80vh; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card {
+        background: white; border-radius: 16px; padding: 20px; text-align: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+    }
+    .stat-card .stat-num { font-size: 28px; font-weight: 800; color: var(--primary-color); }
+    .stat-card .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-top: 4px; }
+    .stat-card.revenue .stat-num { color: #10b981; }
+    .filter-bar {
+        background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px;
+        display: flex; gap: 12px; flex-wrap: wrap; align-items: end;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+    }
+    .filter-bar .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-bar label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; }
+    .filter-bar select, .filter-bar input { border-radius: 8px; border: 1px solid #e5e7eb; padding: 8px 12px; font-size: 13px; }
+    .orders-table-card {
+        background: white; border-radius: 16px; overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+    }
+    .orders-table { width: 100%; border-collapse: collapse; }
+    .orders-table th {
+        background: #f8fafc; padding: 14px 16px; font-size: 11px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 1px; color: #6b7280; text-align: left;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .orders-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; vertical-align: middle; }
+    .orders-table tr:hover { background: #fafbfc; }
+    .status-pill {
+        padding: 4px 14px; border-radius: 50px; font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;
+    }
+    .status-pill.pending   { background: #e0e7ff; color: #3730a3; }
+    .status-pill.processing{ background: #fef3c7; color: #92400e; }
+    .status-pill.shipped   { background: #dbeafe; color: #1e40af; }
+    .status-pill.delivered { background: #d1fae5; color: #065f46; }
+    .status-pill.cancelled { background: #fee2e2; color: #dc2626; }
+    .btn-view { padding: 6px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none;
+                background: var(--primary-color); color: white !important; transition: all 0.2s; }
+    .btn-view:hover { background: #4f46e5; transform: translateY(-1px); }
+    .order-id-link { font-weight: 700; color: var(--primary-color); text-decoration: none; }
+    .order-id-link:hover { text-decoration: underline; }
+    .empty-state { padding: 60px; text-align: center; color: #9ca3af; }
+    @media(max-width:768px) {
+        .orders-table { font-size: 12px; }
+        .orders-table th, .orders-table td { padding: 10px 8px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-page">
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-800 mb-1" style="letter-spacing:-1px;">Order Management</h2>
+            <p class="text-muted mb-0" style="font-size:14px;">View, filter, and manage all customer orders.</p>
+        </div>
+        <a href="{% url 'store:shop_admin_dashboard' %}" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-700">
+            <i class="fas fa-arrow-left me-1"></i> Dashboard
+        </a>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-card revenue">
+            <div class="stat-num">₹{{ total_revenue|floatformat:0 }}</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num">{{ total_orders }}</div>
+            <div class="stat-label">All Orders</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:#3730a3;">{{ pending_orders }}</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:#92400e;">{{ processing_orders }}</div>
+            <div class="stat-label">Processing</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:#1e40af;">{{ shipped_orders }}</div>
+            <div class="stat-label">Shipped</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:#065f46;">{{ delivered_orders }}</div>
+            <div class="stat-label">Delivered</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:#dc2626;">{{ cancelled_orders }}</div>
+            <div class="stat-label">Cancelled</div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <form method="get" class="filter-bar">
+        <div class="form-group">
+            <label>Search</label>
+            <input type="text" name="q" value="{{ search_query }}" placeholder="Order ID, name, email…" style="min-width:180px;">
+        </div>
+        <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+                <option value="">All Statuses</option>
+                {% for val, label in status_choices %}
+                <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>From</label>
+            <input type="date" name="date_from" value="{{ date_from }}">
+        </div>
+        <div class="form-group">
+            <label>To</label>
+            <input type="date" name="date_to" value="{{ date_to }}">
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-700" style="align-self:end;">
+            <i class="fas fa-filter me-1"></i> Filter
+        </button>
+        <a href="{% url 'store:admin_orders_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-700" style="align-self:end;">Clear</a>
+    </form>
+
+    <!-- Orders Table -->
+    <div class="orders-table-card">
+        {% if orders %}
+        <div class="table-responsive">
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Tracking</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>
+                        <a href="{% url 'store:admin_order_detail' order.id %}" class="order-id-link">#{{ order.id }}</a>
+                        {% if order.razorpay_payment_id %}
+                        <br><small class="text-muted" style="font-size:10px;"><i class="fas fa-check-circle text-success"></i> Paid</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong>{{ order.full_name }}</strong>
+                        {% if order.user %}<br><small class="text-muted">{{ order.user.email }}</small>{% endif %}
+                    </td>
+                    <td>{{ order.created_at|date:"M d, Y" }}<br><small class="text-muted">{{ order.created_at|date:"h:i A" }}</small></td>
+                    <td>{{ order.items_count }} item{{ order.items_count|pluralize }}</td>
+                    <td><strong>₹{{ order.total_amount }}</strong></td>
+                    <td>
+                        <span style="font-size:12px;">{{ order.get_payment_method_display }}</span>
+                        {% if order.wallet_amount_used > 0 %}
+                        <br><small class="text-muted">Wallet: ₹{{ order.wallet_amount_used }}</small>
+                        {% endif %}
+                    </td>
+                    <td><span class="status-pill {{ order.status }}">{{ order.get_status_display }}</span></td>
+                    <td>
+                        {% if order.tracking_number %}
+                        <small class="fw-600">{{ order.carrier_name|default:"—" }}</small><br>
+                        <small class="text-muted">{{ order.tracking_number }}</small>
+                        {% else %}
+                        <small class="text-muted">—</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'store:admin_order_detail' order.id %}" class="btn-view">
+                            <i class="fas fa-eye me-1"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox fa-3x mb-3"></i>
+            <h5>No orders found</h5>
+            <p>Try adjusting your filters.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+</div>
+{% endblock %}

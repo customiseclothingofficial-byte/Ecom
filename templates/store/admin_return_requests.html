@@ -1,0 +1,197 @@
+{% extends 'shop_admin_base.html' %}
+
+{% block title %}Return Requests - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .returns-page { padding: 40px 0; min-height: 80vh; }
+    .filter-bar {
+        background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px;
+        display: flex; gap: 12px; flex-wrap: wrap; align-items: end;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+    }
+    .filter-bar .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-bar label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; }
+    .filter-bar select { border-radius: 8px; border: 1px solid #e5e7eb; padding: 8px 12px; font-size: 13px; }
+    .filter-bar .btn-filter { background: var(--primary-color); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 700; font-size: 13px; }
+    .returns-table-card {
+        background: white; border-radius: 16px; overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+    }
+    .returns-table { width: 100%; border-collapse: collapse; }
+    .returns-table th {
+        background: #f8fafc; padding: 14px 16px; font-size: 11px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 1px; color: #6b7280; text-align: left; border-bottom: 2px solid #e5e7eb;
+    }
+    .returns-table td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; vertical-align: middle; }
+    .returns-table tr:hover { background: #fafbfc; }
+    .status-pill {
+        padding: 4px 14px; border-radius: 50px; font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;
+    }
+    .status-pill.pending   { background: #fef3c7; color: #92400e; }
+    .status-pill.approved  { background: #d1fae5; color: #065f46; }
+    .status-pill.rejected  { background: #fee2e2; color: #dc2626; }
+    .status-pill.completed { background: #dbeafe; color: #1e40af; }
+    .btn-action {
+        padding: 5px 14px; border-radius: 8px; font-size: 11px; font-weight: 700;
+        border: none; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-approve { background: #d1fae5; color: #065f46; }
+    .btn-approve:hover { background: #a7f3d0; }
+    .btn-reject { background: #fee2e2; color: #dc2626; }
+    .btn-reject:hover { background: #fecaca; }
+    .empty-state { padding: 60px; text-align: center; color: #9ca3af; }
+    .modal-overlay {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+        z-index: 9999; align-items: center; justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+        background: white; border-radius: 16px; padding: 28px; max-width: 480px; width: 90%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .modal-box h4 { font-weight: 800; margin-bottom: 16px; }
+    .modal-box textarea { width: 100%; border-radius: 8px; border: 1px solid #e5e7eb; padding: 10px; font-size: 13px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+    .modal-actions button { padding: 8px 20px; border-radius: 8px; font-weight: 700; font-size: 13px; border: none; cursor: pointer; }
+    .btn-cancel-modal { background: #f1f5f9; color: #374151; }
+    .btn-confirm-modal { background: var(--primary-color); color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container returns-page">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="{% url 'store:shop_admin_dashboard' %}" class="text-decoration-none" style="font-size: 13px;">
+                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+            </a>
+            <h2 class="mt-2 mb-0" style="font-weight: 800;">Return Requests</h2>
+        </div>
+    </div>
+
+    <!-- Filter -->
+    <form method="get" class="filter-bar">
+        <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+                <option value="">All</option>
+                {% for value, label in return_status_choices %}
+                <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn-filter">Filter</button>
+    </form>
+
+    <!-- Table -->
+    <div class="returns-table-card">
+        {% if returns %}
+        <table class="returns-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Refund</th>
+                    <th>Requested</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in returns %}
+                <tr>
+                    <td>#{{ r.id }}</td>
+                    <td>
+                        <a href="{% url 'store:admin_order_detail' r.order.id %}" style="font-weight: 700; color: var(--primary-color); text-decoration: none;">
+                            #{{ r.order.id }}
+                        </a>
+                    </td>
+                    <td>{{ r.user.username }}</td>
+                    <td>{{ r.get_reason_display }}</td>
+                    <td><span class="status-pill {{ r.status }}">{{ r.get_status_display }}</span></td>
+                    <td>₹{{ r.refund_amount }}</td>
+                    <td>{{ r.requested_at|date:"M d, Y" }}</td>
+                    <td>
+                        {% if r.status == 'pending' %}
+                        <button class="btn-action btn-approve me-1" onclick="openModal('approve', {{ r.id }})">Approve</button>
+                        <button class="btn-action btn-reject" onclick="openModal('reject', {{ r.id }})">Reject</button>
+                        {% elif r.status == 'completed' %}
+                        <small class="text-success">Completed</small>
+                        {% elif r.status == 'rejected' %}
+                        <small class="text-danger">Rejected</small>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox" style="font-size: 40px; margin-bottom: 12px;"></i>
+            <p>No return requests found.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Action Modal -->
+<div class="modal-overlay" id="action-modal">
+    <div class="modal-box">
+        <h4 id="modal-title">Confirm Action</h4>
+        <p id="modal-desc" style="font-size: 14px; color: #6b7280;"></p>
+        <textarea id="modal-notes" rows="3" placeholder="Admin notes (optional)..."></textarea>
+        <div class="modal-actions">
+            <button class="btn-cancel-modal" onclick="closeModal()">Cancel</button>
+            <button class="btn-confirm-modal" id="modal-confirm-btn" onclick="submitAction()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentAction = '';
+let currentReturnId = null;
+
+function openModal(action, returnId) {
+    currentAction = action;
+    currentReturnId = returnId;
+    document.getElementById('modal-title').textContent = action === 'approve' ? 'Approve Return Request' : 'Reject Return Request';
+    document.getElementById('modal-desc').textContent = action === 'approve'
+        ? 'This will approve the return and add the refund to the customer\'s wallet.'
+        : 'This will reject the return request. The customer will be notified.';
+    document.getElementById('modal-notes').value = '';
+    document.getElementById('action-modal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('action-modal').classList.remove('active');
+}
+
+function submitAction() {
+    const notes = document.getElementById('modal-notes').value;
+    const formData = new FormData();
+    formData.append('action', currentAction);
+    formData.append('admin_notes', notes);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch("{% url 'store:admin_process_return' 0 %}".replace('/0/', '/' + currentReturnId + '/'), {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        closeModal();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(err => alert('Network error. Please try again.'));
+}
+</script>
+{% endblock %}
