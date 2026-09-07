@@ -6,6 +6,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Customise Clothing - Your Online Store{% endblock %}</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block meta_description %}Customise Clothing - Custom printed t-shirts, oversized tees, hoodies, and personalized apparel in India.{% endblock %}">
+    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+
+    <!-- Open Graph / WhatsApp / Facebook / Instagram Link Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Customise Clothing">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% block og_title %}Customise Clothing - Your Online Store{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Design & buy custom t-shirts, oversized tees, hoodies, and personalized apparel at Customise Clothing.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/seo-share.png' %}{% endblock %}">
+    <meta property="og:image:secure_url" content="{% block og_image_secure %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/seo-share.png' %}{% endblock %}">
+    <meta property="og:image:type" content="image/png">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Customise Clothing - Your Online Store{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Design & buy custom t-shirts, oversized tees, hoodies, and personalized apparel at Customise Clothing.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/seo-share.png' %}{% endblock %}">
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
     <!-- Bootstrap 5 CSS -->
