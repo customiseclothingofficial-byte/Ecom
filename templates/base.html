@@ -33,95 +33,23 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            max-width: 100%;
+            overflow-x: clip;
+        }
+
         body {
             background-color: var(--primary-bg);
             padding-bottom: var(--bottom-nav-height);
             margin: 0;
             -webkit-font-smoothing: antialiased;
             color: var(--veirdo-black);
-            /* NOTE: do not add overflow-x rules to body/html here — they break
-               the sticky header. Keep overflow guards page-local instead. */
+            width: 100%;
         }
 
         img,
         video {
             max-width: 100%;
-        }
-
-        /* ===== Shared responsive layout utilities (used by many pages) ===== */
-        .container-modern {
-            width: 100%;
-            max-width: 1140px;
-            margin: 0 auto;
-            padding-left: 16px;
-            padding-right: 16px;
-        }
-
-        .page-header-modern {
-            margin-bottom: 1.25rem;
-            text-align: left;
-        }
-
-        .page-title-modern {
-            font-size: 1.75rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 0.35rem;
-            line-height: 1.2;
-            color: #111827;
-        }
-
-        .page-subtitle-modern {
-            color: #6B7280;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            max-width: 650px;
-            margin: 0;
-        }
-
-        @media (max-width: 576px) {
-            .page-title-modern {
-                font-size: 1.4rem;
-            }
-        }
-
-        /* Promo Bar */
-        .veirdo-promo-bar {
-            background-color: #3B82F6;
-            color: #fff;
-            min-height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
-            gap: 20px;
-            padding: 4px 20px;
-        }
-
-        .veirdo-promo-bar span {
-            flex: 1 1 auto;
-            min-width: 0;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .veirdo-promo-bar i {
-            flex: 0 0 auto;
-        }
-
-        @media (max-width: 576px) {
-            .veirdo-promo-bar {
-                gap: 10px;
-                font-size: 11px;
-                padding: 4px 12px;
-            }
-
-            .veirdo-promo-bar i {
-                display: none;
-            }
         }
 
         /* Main Header */
@@ -131,6 +59,8 @@
             position: sticky;
             top: 0;
             z-index: 1050;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         /* Ensure ALL offcanvas drawers (mobile menu AND bottom-sheet filter
@@ -765,6 +695,9 @@
         </div>
     </header>
 
+    <!-- Main Body Layout Wrapper (Prevents Horizontal Scroll on Mobile) -->
+    <div class="page-content-wrapper" style="width: 100%; max-width: 100vw; overflow-x: hidden;">
+
     <!-- Global Category Circles Navigation (Dynamic Slider) -->
     <div class="category-circles-wrapper">
         <div class="nav-arrow nav-arrow-left"
@@ -845,6 +778,7 @@
             <p class="footer-copyright">&copy; 2026 Customise Clothing. All rights reserved.</p>
         </div>
     </footer>
+    </div> <!-- End page-content-wrapper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

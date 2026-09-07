@@ -380,10 +380,12 @@
     .veirdo-hero {
         position: relative;
         width: 100%;
+        max-width: 100%;
         background-size: cover;
         background-position: center;
         display: flex;
         align-items: center;
+        overflow: hidden;
     }
 
     .hero-large {
@@ -404,7 +406,7 @@
         }
 
         .veirdo-hero-title {
-            font-size: 32px !important;
+            font-size: clamp(22px, 7vw, 34px) !important;
         }
     }
 
@@ -413,6 +415,7 @@
         z-index: 2;
         padding: 40px 20px;
         max-width: 600px;
+        box-sizing: border-box;
     }
 
     .veirdo-hero-tag {
@@ -433,6 +436,8 @@
         line-height: 1.1;
         margin-bottom: 16px;
         text-transform: uppercase;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .veirdo-hero-desc {
