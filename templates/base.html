@@ -6,6 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Customise Clothing - Your Online Store{% endblock %}</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -117,7 +119,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 20px;
+            padding: 8px 15px;
             max-width: 1400px;
             margin: 0 auto;
         }
@@ -125,7 +127,7 @@
         .header-left-section {
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 12px;
         }
 
         .header-logo {
@@ -328,7 +330,7 @@
 
         @media (min-width: 992px) {
             .header-inner {
-                padding: 15px 40px;
+                padding: 10px 20px;
             }
 
             .bottom-nav {
@@ -583,9 +585,12 @@
     <div id="site-loader"
         style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s ease, visibility 0.8s; visibility: visible; opacity: 1;">
         <div style="text-align: center; overflow: hidden;">
+            <div style="margin-bottom: 12px;">
+                <img src="{% static 'images/logo.png' %}" alt="Customise Clothing Logo" style="height: 65px; width: auto; object-fit: contain; transform: translateY(100%); animation: slideUpReveal 0.8s forwards cubic-bezier(0.2, 1, 0.3, 1);">
+            </div>
             <div style="margin-bottom: 5px;">
                 <h1
-                    style="color: #10b981; font-family: 'Outfit', sans-serif; font-weight: 900; letter-spacing: 2px; margin: 0; font-size: 38px; line-height: 1; transform: translateY(100%); animation: slideUpReveal 0.8s forwards cubic-bezier(0.2, 1, 0.3, 1);">
+                    style="color: #10b981; font-family: 'Outfit', sans-serif; font-weight: 900; letter-spacing: 2px; margin: 0; font-size: 38px; line-height: 1; transform: translateY(100%); animation: slideUpReveal 0.8s 0.1s forwards cubic-bezier(0.2, 1, 0.3, 1);">
                     CUSTOMISE</h1>
             </div>
             <div>
@@ -692,11 +697,12 @@
         <div class="header-inner">
             <div class="header-left-section">
                 <!-- Mobile Menu Icon -->
-                <i class="fas fa-bars cursor-pointer d-lg-none" style="font-size: 22px; margin-right: 15px;"
+                <i class="fas fa-bars cursor-pointer d-lg-none" style="font-size: 22px; margin-right: 8px;"
                     data-bs-toggle="offcanvas" data-bs-target="#mobileMenu"></i>
 
                 <!-- Logo -->
-                <a href="{% url 'store:home' %}" class="header-logo" style="text-decoration: none;">
+                <a href="{% url 'store:home' %}" class="header-logo d-flex align-items-center" style="text-decoration: none; gap: 10px;">
+                    <img src="{% static 'images/logo.png' %}" alt="Customise Clothing Logo" style="height: 58px; width: auto; object-fit: contain;">
                     <span class="logo-text"><span class="logo-accent">CUSTOMISE</span><span
                             class="logo-dark">CLOTHING</span></span>
                 </a>
@@ -790,7 +796,10 @@
     <!-- Footer - VEIRDO Style -->
     <footer class="veirdo-footer">
         <div class="container-fluid">
-            <h3 class="footer-logo" style="font-size: 24px;">CUSTOMISE CLOTHING</h3>
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                <img src="{% static 'images/logo.png' %}" alt="Customise Clothing Logo" style="height: 38px; width: auto; object-fit: contain;">
+                <h3 class="footer-logo mb-0" style="font-size: 24px;">CUSTOMISE CLOTHING</h3>
+            </div>
             <p class="footer-tagline">FIND YOUR FLIP SIDE</p>
 
             <div class="footer-links">
