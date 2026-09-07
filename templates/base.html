@@ -25,6 +25,7 @@
             --veirdo-blue: #004CFF;
             --veirdo-purple: #9333EA;
             --veirdo-grey: #F3F4F6;
+            --text-muted: #6B7280;
         }
 
         * {
@@ -38,19 +39,89 @@
             margin: 0;
             -webkit-font-smoothing: antialiased;
             color: var(--veirdo-black);
+            /* NOTE: do not add overflow-x rules to body/html here — they break
+               the sticky header. Keep overflow guards page-local instead. */
+        }
+
+        img,
+        video {
+            max-width: 100%;
+        }
+
+        /* ===== Shared responsive layout utilities (used by many pages) ===== */
+        .container-modern {
+            width: 100%;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        .page-header-modern {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .page-title-modern {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.35rem;
+            line-height: 1.2;
+            color: #111827;
+        }
+
+        .page-subtitle-modern {
+            color: #6B7280;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            max-width: 650px;
+            margin: 0;
+        }
+
+        @media (max-width: 576px) {
+            .page-title-modern {
+                font-size: 1.4rem;
+            }
         }
 
         /* Promo Bar */
         .veirdo-promo-bar {
             background-color: #3B82F6;
             color: #fff;
-            height: 38px;
+            min-height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 13px;
             font-weight: 700;
             gap: 20px;
+            padding: 4px 20px;
+        }
+
+        .veirdo-promo-bar span {
+            flex: 1 1 auto;
+            min-width: 0;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .veirdo-promo-bar i {
+            flex: 0 0 auto;
+        }
+
+        @media (max-width: 576px) {
+            .veirdo-promo-bar {
+                gap: 10px;
+                font-size: 11px;
+                padding: 4px 12px;
+            }
+
+            .veirdo-promo-bar i {
+                display: none;
+            }
         }
 
         /* Main Header */
@@ -62,8 +133,11 @@
             z-index: 1050;
         }
 
-        /* Ensure Offcanvas Mobile Menu is in front of main header (z-index 1050) */
-        .offcanvas.offcanvas-start {
+        /* Ensure ALL offcanvas drawers (mobile menu AND bottom-sheet filter
+           drawer) render ABOVE the backdrop (z-index 1090) and the main
+           header (1050). Without this the filter drawer (Bootstrap default
+           1045) ends up dimmed underneath its own backdrop. */
+        .offcanvas {
             z-index: 1095 !important;
         }
 
@@ -173,8 +247,44 @@
             }
 
             .header-inner {
-                padding: 10px 15px;
+                padding: 10px 12px;
             }
+
+            .header-left-section {
+                gap: 10px;
+                min-width: 0;
+            }
+
+            .header-right-section {
+                gap: 12px;
+            }
+
+            .header-icons {
+                gap: 12px;
+            }
+
+            .header-icons i {
+                font-size: 17px;
+            }
+        }
+
+        /* Logo scales fluidly so it never overflows on small phones */
+        .logo-text {
+            font-size: clamp(15px, 4.6vw, 26px);
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .logo-accent {
+            color: #12B76A;
+        }
+
+        .logo-dark {
+            color: #000;
+            margin-left: 2px;
         }
 
         .header-icons {
@@ -619,10 +729,8 @@
 
                 <!-- Logo -->
                 <a href="{% url 'store:home' %}" class="header-logo" style="text-decoration: none;">
-                    <span style="font-size: 26px; font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase;">
-                        <span style="color: #12B76A;">CUSTOMISE</span>
-                        <span style="color: #000; margin-left: 2px;">CLOTHING</span>
-                    </span>
+                    <span class="logo-text"><span class="logo-accent">CUSTOMISE</span><span
+                            class="logo-dark">CLOTHING</span></span>
                 </a>
 
                 <!-- Removed Desktop Nav Links as per user request -->
