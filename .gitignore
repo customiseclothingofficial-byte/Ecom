@@ -131,7 +131,7 @@ dmypy.json
 # Django specific
 media/
 staticfiles/
-static/
+# static/ directory contains source assets (logos, images, custom CSS/JS) and should be tracked in git.
 
 # Database
 *.sqlite3
